@@ -1,11 +1,14 @@
 package main
 
 import (
+	"github.com/analog-substance/sulfur/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/router"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"log"
 	"os"
 	"strings"
 
+	_ "github.com/analog-substance/sulfur/migrations"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
@@ -13,6 +16,7 @@ import (
 
 func main() {
 	app := pocketbase.New()
+	model.SetApp(app)
 
 	// loosely check if it was executed using "go run"
 	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
@@ -29,6 +33,8 @@ func main() {
 
 		return se.Next()
 	})
+
+	app.OnServe().BindFunc(router.AttachRoutes)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
