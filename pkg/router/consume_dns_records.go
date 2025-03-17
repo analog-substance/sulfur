@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type dnsRecord struct {
@@ -44,13 +45,19 @@ func consumeDNSRecord(e *core.RequestEvent) error {
 			log.Println(rdr)
 		}
 
-		dnsr := model.FindDNSRecord(record.Name, record.Value, record.Type)
+		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		dnsr.SetTTL(time.Duration(record.TTL) * time.Second)
+		dnsr.SetLastSeen(time.Now())
+		dnsr.SetLastResolved(time.Now())
 
-		dnsr := &model.DNSRecord{}
-		dnsr.SetTTL(record.TTL)
-		dnsr.SetType(record.Type)
-		dnsr.SetValue(record.Value)
-		dnsr.SetName(record.Name)
+		err = dnsr.Save()
+		if err != nil {
+			log.Println(err)
+		}
 
 	}
 	return e.String(http.StatusOK, "done")

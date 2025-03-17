@@ -1,8 +1,6 @@
 package model
 
 import (
-	"database/sql"
-	"errors"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -43,6 +41,22 @@ func (a *DNSRecord) TTL() time.Duration {
 	return time.Duration(ttl) * time.Second
 }
 
+func (a *DNSRecord) ResolveError() string {
+	return a.GetString("resolve_error")
+}
+
+func (a *DNSRecord) ResolveErrorCount() string {
+	return a.GetString("resolve_error_count")
+}
+
+func (a *DNSRecord) LastResolved() types.DateTime {
+	return a.GetDateTime("last_resolved")
+}
+
+func (a *DNSRecord) LastSeen() types.DateTime {
+	return a.GetDateTime("last_seen")
+}
+
 func (a *DNSRecord) Created() types.DateTime {
 	return a.GetDateTime("created")
 }
@@ -59,35 +73,44 @@ func (a *DNSRecord) SetValue(val string) {
 	a.Set("value", val)
 }
 
-func (a *DNSRecord) SetTTL(newTTL int) {
+func (a *DNSRecord) SetTTL(newTTL time.Duration) {
 	a.Set("ttl", newTTL)
 }
+
 func (a *DNSRecord) SetType(recordType string) {
 	a.Set("type", recordType)
 }
 
-func FindDNSRecord(recordName, recordValue, recordType string) (iface.DNSRecord, error) {
+func (a *DNSRecord) SetResolveErr(resolveErr string) {
+	a.Set("resolve_error", resolveErr)
+}
 
+func (a *DNSRecord) SetResolveErrCount(errCount int) {
+	a.Set("resolve_error_count", errCount)
+}
+
+func (a *DNSRecord) SetLastResolved(lastResolved time.Time) {
+	a.Set("last_resolved", lastResolved)
+}
+
+func (a *DNSRecord) SetLastSeen(lastSeen time.Time) {
+	a.Set("last_seen", lastSeen)
+}
+
+func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.DNSRecord, error) {
 	dnsR := &DNSRecord{}
-
-	record, err := GetApp().FindFirstRecordByFilter(
+	record, err := FirstOrCreateByFilter(
 		DNSRecords,
-		"name={:recordName} AND value={:recordValue} AND type={:recordType}",
+		"name={:name} && value={:value} && type={:type}",
 		dbx.Params{
-			"recordName":  recordName,  // case insensitive match
-			"recordValue": recordValue, // case insensitive match
-			"recordType":  recordType,
+			"name":  recordName,  // case insensitive match
+			"value": recordValue, // case insensitive match
+			"type":  recordType,
 		})
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, err
-		}
-		coll, err := GetApp().FindCollectionByNameOrId(DNSRecords)
-		if err != nil {
-			return nil, err
-		}
-		
-	}
 
+	if err != nil {
+		return nil, err
+	}
+	dnsR.SetProxyRecord(record)
 	return dnsR, nil
 }
