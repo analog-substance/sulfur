@@ -1,6 +1,7 @@
 package iface
 
 import (
+	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -10,6 +11,7 @@ type DNSRecord interface {
 	SetValue(string)
 	SetType(string)
 	SetTTL(time.Duration)
+	SetRootDomain(domain AssetRootDomain)
 
 	SetResolveErr(resolveErr string)
 	SetResolveErrCount(errCount int)
@@ -20,7 +22,7 @@ type DNSRecord interface {
 	Value() string
 	Type() string
 	TTL() time.Duration
-	RootDomain() RootDomain
+	RootDomain() AssetRootDomain
 	ResolveError() string
 	ResolveErrorCount() string
 	LastResolved() types.DateTime
@@ -28,4 +30,5 @@ type DNSRecord interface {
 	Created() types.DateTime
 	Updated() types.DateTime
 	Save() error
+	ProxyRecord() *core.Record
 }

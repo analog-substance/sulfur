@@ -5,10 +5,11 @@ import (
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
+	"strings"
 	"time"
 )
 
-const DNSRecords = "dns_records"
+const DNSRecordCollection = "dns_records"
 
 // ensures that the Article struct satisfy the core.RecordProxy interface
 var _ core.RecordProxy = (*DNSRecord)(nil)
@@ -21,8 +22,8 @@ func (a *DNSRecord) Save() error {
 	return GetApp().Save(a)
 }
 
-func (a *DNSRecord) RootDomain() iface.RootDomain {
-	return &RootDomain{}
+func (a *DNSRecord) RootDomain() iface.AssetRootDomain {
+	return &AssetRootDomain{}
 }
 
 func (a *DNSRecord) Name() string {
@@ -81,6 +82,10 @@ func (a *DNSRecord) SetType(recordType string) {
 	a.Set("type", recordType)
 }
 
+func (a *DNSRecord) SetRootDomain(domain iface.AssetRootDomain) {
+	a.Set("root_domain", domain.ProxyRecord().Id)
+}
+
 func (a *DNSRecord) SetResolveErr(resolveErr string) {
 	a.Set("resolve_error", resolveErr)
 }
@@ -99,13 +104,30 @@ func (a *DNSRecord) SetLastSeen(lastSeen time.Time) {
 
 func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.DNSRecord, error) {
 	dnsR := &DNSRecord{}
+
+	//err := GetApp().RecordQuery(DNSRecordCollection).
+	//	AndWhere(dbx.NewExp("LOWER(name)={:name} AND value={:value} AND UPPER(type)={:type}", dbx.Params{
+	//		"name":  strings.ToLower(recordName),
+	//		"value": recordValue,
+	//		"type":  strings.ToUpper(recordType),
+	//	})).
+	//	Limit(1).
+	//	One(dnsR)
+	//
+	//if err != nil {
+	//	if errors.Is(err, sql.ErrNoRows) {
+	//
+	//	}
+	//}
 	record, err := FirstOrCreateByFilter(
-		DNSRecords,
-		"name={:name} && value={:value} && type={:type}",
+		DNSRecordCollection,
+		//"name={:name} && value={:value} && type={:type}",
+		"LOWER(name)={:name} AND value={:value} AND UPPER(type)={:type}",
+
 		dbx.Params{
-			"name":  recordName,  // case insensitive match
-			"value": recordValue, // case insensitive match
-			"type":  recordType,
+			"name":  strings.ToLower(recordName),
+			"value": recordValue,
+			"type":  strings.ToUpper(recordType),
 		})
 
 	if err != nil {

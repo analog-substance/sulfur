@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/pocketbase/pocketbase/core"
-	"golang.org/x/net/publicsuffix"
 	"io"
 	"log"
 	"net/http"
@@ -32,33 +31,25 @@ func consumeDNSRecord(e *core.RequestEvent) error {
 
 	for _, record := range records {
 
-		rootDomain, err := publicsuffix.EffectiveTLDPlusOne(record.Name)
-		if err != nil {
-			return err
-		}
-
-		rdr, err := model.FindRootDomain(rootDomain)
-		if err != nil {
-			log.Println(err)
-		} else {
-
-			log.Println(rdr)
-		}
-
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
 		if err != nil {
-			log.Println(err)
+			log.Println("unable to find or create dns record", err)
 			continue
 		}
 		dnsr.SetTTL(time.Duration(record.TTL) * time.Second)
 		dnsr.SetLastSeen(time.Now())
 		dnsr.SetLastResolved(time.Now())
 
-		err = dnsr.Save()
-		if err != nil {
-			log.Println(err)
+		rootDomain, err := model.FindAssetRootDomain(record.Name)
+		if err == nil {
+			log.Println("Found root domain", rootDomain.DomainName())
+			dnsr.SetRootDomain(rootDomain)
 		}
 
+		err = dnsr.Save()
+		if err != nil {
+			log.Println("err saving dns record", err)
+		}
 	}
 	return e.String(http.StatusOK, "done")
 }

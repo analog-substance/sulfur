@@ -24,11 +24,19 @@ func GetApp() *pocketbase.PocketBase {
 
 func FirstOrCreateByFilter(nameOrID string, filter string, params ...dbx.Params) (*core.Record, error) {
 
-	record, err := GetApp().FindFirstRecordByFilter(
-		nameOrID,
-		filter,
-		params...,
-	)
+	record := &core.Record{}
+
+	err := GetApp().RecordQuery(nameOrID).
+		AndWhere(dbx.NewExp(filter, params...)).
+		Limit(1).
+		One(record)
+
+	//
+	//record, err := GetApp().FindFirstRecordByFilter(
+	//	nameOrID,
+	//	filter,
+	//	params...,
+	//)
 
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
