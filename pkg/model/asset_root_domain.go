@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -19,7 +20,7 @@ type AssetRootDomain struct {
 }
 
 func (a *AssetRootDomain) Save() error {
-	return GetApp().Save(a)
+	return app_state.GetApp().Save(a)
 }
 
 func (a *AssetRootDomain) Registrar() string {
@@ -60,7 +61,7 @@ func FindAssetRootDomain(rootDomainName string) (iface.AssetRootDomain, error) {
 
 	rdr := &AssetRootDomain{}
 
-	err = GetApp().RecordQuery(AssetRootDomainCollection).
+	err = app_state.GetApp().RecordQuery(AssetRootDomainCollection).
 		AndWhere(dbx.NewExp("LOWER(domain)={:domain}", dbx.Params{
 			"domain": strings.ToLower(rootDomain),
 		})).

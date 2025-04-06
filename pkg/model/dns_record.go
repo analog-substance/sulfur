@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -19,7 +20,7 @@ type DNSRecord struct {
 }
 
 func (a *DNSRecord) Save() error {
-	return GetApp().Save(a)
+	return app_state.GetApp().Save(a)
 }
 
 func (a *DNSRecord) RootDomain() iface.AssetRootDomain {
@@ -135,4 +136,24 @@ func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.D
 	}
 	dnsR.SetProxyRecord(record)
 	return dnsR, nil
+}
+
+type DNSScope struct {
+	Host string `db:"host" json:"host"`
+}
+
+func GetAuditScopeDNS() ([]DNSScope, error) {
+	accounts := []DNSScope{}
+	err := app_state.GetApp().DB().
+		NewQuery("SELECT dns_records.name host FROM dns_records " +
+			"WHERE type = 'A' " +
+			"AND dns_records.id in (" +
+			"SELECT dns_records.id WHERE type = 'A' AND  " +
+			"(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours') or last_resolved < updated)" +
+			"OR (resolve_error IS NOT NULL))" +
+			"GROUP BY dns_records.name",
+		).
+		All(&accounts)
+
+	return accounts, err
 }

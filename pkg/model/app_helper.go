@@ -3,30 +3,16 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/pocketbase/dbx"
-	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 )
-
-var app *pocketbase.PocketBase
-
-func SetApp(sapp *pocketbase.PocketBase) {
-	app = sapp
-}
-
-func GetApp() *pocketbase.PocketBase {
-	if app == nil {
-		panic("app not initialized")
-	}
-
-	return app
-}
 
 func FirstOrCreateByFilter(nameOrID string, filter string, params ...dbx.Params) (*core.Record, error) {
 
 	record := &core.Record{}
 
-	err := GetApp().RecordQuery(nameOrID).
+	err := app_state.GetApp().RecordQuery(nameOrID).
 		AndWhere(dbx.NewExp(filter, params...)).
 		Limit(1).
 		One(record)
@@ -43,7 +29,7 @@ func FirstOrCreateByFilter(nameOrID string, filter string, params ...dbx.Params)
 			// an error that isn't empty results
 			return nil, err
 		}
-		collection, err := app.FindCollectionByNameOrId(nameOrID)
+		collection, err := app_state.GetApp().FindCollectionByNameOrId(nameOrID)
 		if err != nil {
 			return nil, err
 		}

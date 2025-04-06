@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
@@ -16,7 +17,7 @@ type Organization struct {
 }
 
 func (a *Organization) Save() error {
-	return GetApp().Save(a)
+	return app_state.GetApp().Save(a)
 }
 
 func (a *Organization) Name() string {
@@ -35,7 +36,7 @@ func FindOrgByID(orgID string) (iface.Organization, error) {
 
 	rdr := &Organization{}
 
-	record, err := app.FindRecordById(OrganizationCollection, orgID)
+	record, err := app_state.GetApp().FindRecordById(OrganizationCollection, orgID)
 	if err != nil {
 		return nil, err
 	}
