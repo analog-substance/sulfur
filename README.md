@@ -24,6 +24,19 @@ go install github.com/analog-substance/sulfur@latest
 ```
 * * *
 
+## Developing and Testing
+
+### Create new DNS records
+```bash
+ curl -X POST http://localhost:8090/consume/dns_records --data '[{"name":"test_admin.nowhere.com","value":"asd","type":"A","ttl":300}]'
+```
+
+### Add new root domain
+
+```bash
+curl -X POST http://localhost:8090/consume/34p74qh0le8h32c/assets/root_domains --data '[{"domain":"nowhere.com","registrar":"godaddy"}]' 
+```
+
 ## Feedback
 
 ### I have an issue or feature request
@@ -31,6 +44,7 @@ go install github.com/analog-substance/sulfur@latest
 Sweet! [Open an issue](https://github.com/analog-substance/sulfur/issues/new) to start the conversation.
 
 * * *
+
 
 ## Database layout (planned)
 
