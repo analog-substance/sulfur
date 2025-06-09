@@ -30,7 +30,6 @@ func consumeDNSRecord(e *core.RequestEvent) error {
 	}
 
 	for _, record := range records {
-
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
 		if err != nil {
 			log.Println("unable to find or create dns record", err)
@@ -40,11 +39,22 @@ func consumeDNSRecord(e *core.RequestEvent) error {
 		dnsr.SetLastSeen(time.Now())
 		dnsr.SetLastResolved(time.Now())
 
-		rootDomain, err := model.FindAssetRootDomain(record.Name)
-		if err == nil {
-			log.Println("Found root domain", rootDomain.DomainName())
-			dnsr.SetRootDomain(rootDomain)
+		rootDomain, err := model.RootDomainFirstOrCreate(record.Name)
+		if err != nil {
+			log.Println("unable to find or create root domain record", err)
+			continue
 		}
+
+		if rootDomain.ProxyRecord().Id == "" {
+			err = rootDomain.Save()
+			if err != nil {
+				log.Println("unable to save root domain", err)
+				continue
+			}
+		}
+
+		log.Println("Found root domain", rootDomain.DomainName())
+		dnsr.SetRootDomain(rootDomain)
 
 		err = dnsr.Save()
 		if err != nil {

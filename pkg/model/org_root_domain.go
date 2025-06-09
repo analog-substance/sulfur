@@ -8,30 +8,35 @@ import (
 	"github.com/pocketbase/pocketbase/tools/types"
 	"golang.org/x/net/publicsuffix"
 	"strings"
+	"time"
 )
 
-const AssetRootDomainCollection = "asset_root_domains"
+const OrgRootDomainCollection = "org_domains"
 
 // ensures that the Article struct satisfy the core.RecordProxy interface
-var _ core.RecordProxy = (*AssetRootDomain)(nil)
+var _ core.RecordProxy = (*OrgRootDomain)(nil)
 
-type AssetRootDomain struct {
+type OrgRootDomain struct {
 	core.BaseRecordProxy
 }
 
-func (a *AssetRootDomain) Save() error {
+func (a *OrgRootDomain) Save() error {
 	return app_state.GetApp().Save(a)
 }
 
-func (a *AssetRootDomain) Registrar() string {
+func (a *OrgRootDomain) Registrar() string {
 	return a.GetString("registrar")
 }
 
-func (a *AssetRootDomain) DomainName() string {
+func (a *OrgRootDomain) DomainName() string {
 	return a.GetString("domain")
 }
 
-func (a *AssetRootDomain) DNSRecords() []iface.DNSRecord {
+func (a *OrgRootDomain) LastSeen() types.DateTime {
+	return a.GetDateTime("last_seen")
+}
+
+func (a *OrgRootDomain) DNSRecords() []iface.DNSRecord {
 	var s []iface.DNSRecord
 
 	m := &DNSRecord{}
@@ -40,28 +45,36 @@ func (a *AssetRootDomain) DNSRecords() []iface.DNSRecord {
 	return s
 }
 
-//func (a *AssetRootDomain) SubDomains() (domains []*AssetRootDomain) {
+//func (a *RootDomain) SubDomains() (domains []*RootDomain) {
 //	return domains
 //}
 
-func (a *AssetRootDomain) Created() types.DateTime {
+func (a *OrgRootDomain) Created() types.DateTime {
 	return a.GetDateTime("created")
 }
 
-func (a *AssetRootDomain) Updated() types.DateTime {
+func (a *OrgRootDomain) Updated() types.DateTime {
 	return a.GetDateTime("updated")
 }
 
-func FindAssetRootDomain(rootDomainName string) (iface.AssetRootDomain, error) {
+func (a *OrgRootDomain) SetRegistrar(registrar string) {
+	a.Set("registrar", registrar)
+}
+
+func (a *OrgRootDomain) SetLastSeen(lastSeen time.Time) {
+	a.Set("last_seen", lastSeen)
+}
+
+func FindOrgRootDomain(rootDomainName string) (iface.OrgRootDomain, error) {
 
 	if strings.HasSuffix(rootDomainName, ".") {
 		rootDomainName = rootDomainName[:len(rootDomainName)-1]
 	}
 	rootDomain, err := publicsuffix.EffectiveTLDPlusOne(rootDomainName)
 
-	rdr := &AssetRootDomain{}
+	rdr := &OrgRootDomain{}
 
-	err = app_state.GetApp().RecordQuery(AssetRootDomainCollection).
+	err = app_state.GetApp().RecordQuery(OrgRootDomainCollection).
 		AndWhere(dbx.NewExp("LOWER(domain)={:domain}", dbx.Params{
 			"domain": strings.ToLower(rootDomain),
 		})).
@@ -76,16 +89,16 @@ func FindAssetRootDomain(rootDomainName string) (iface.AssetRootDomain, error) {
 
 }
 
-func AssetRootDomainFirstOrCreate(domain, orgID string) (iface.AssetRootDomain, error) {
-	dnsR := &AssetRootDomain{}
+func OrgRootDomainFirstOrCreate(rootDomainID, orgID string) (iface.OrgRootDomain, error) {
+	dnsR := &OrgRootDomain{}
 
 	record, err := FirstOrCreateByFilter(
-		AssetRootDomainCollection,
+		OrgRootDomainCollection,
 		//"name={:name} && value={:value} && type={:type}",
-		"LOWER(domain)={:name} AND organization={:orgID}",
+		"root_domain={:root_domain} AND organization={:organization}",
 
 		dbx.Params{
-			"name":         strings.ToLower(domain),
+			"root_domain":  rootDomainID,
 			"organization": orgID,
 		})
 

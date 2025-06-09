@@ -23,8 +23,8 @@ func (a *DNSRecord) Save() error {
 	return app_state.GetApp().Save(a)
 }
 
-func (a *DNSRecord) RootDomain() iface.AssetRootDomain {
-	return &AssetRootDomain{}
+func (a *DNSRecord) RootDomain() iface.RootDomain {
+	return &RootDomain{}
 }
 
 func (a *DNSRecord) Name() string {
@@ -83,7 +83,7 @@ func (a *DNSRecord) SetType(recordType string) {
 	a.Set("type", recordType)
 }
 
-func (a *DNSRecord) SetRootDomain(domain iface.AssetRootDomain) {
+func (a *DNSRecord) SetRootDomain(domain iface.RootDomain) {
 	a.Set("root_domain", domain.ProxyRecord().Id)
 }
 

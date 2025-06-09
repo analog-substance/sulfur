@@ -7,9 +7,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
-type assetRootDomain struct {
+type orgRootDomainRequest struct {
 	Domain    string `json:"domain"`
 	Registrar string `json:"registrar"`
 }
@@ -23,7 +24,7 @@ func consumeAssetRootDomains(e *core.RequestEvent) error {
 		return e.String(http.StatusNotFound, "invalid request")
 	}
 
-	domains := []assetRootDomain{}
+	domains := []orgRootDomainRequest{}
 	jsonBytes, err := io.ReadAll(e.Request.Body)
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid request body")
@@ -36,14 +37,32 @@ func consumeAssetRootDomains(e *core.RequestEvent) error {
 
 	for _, domain := range domains {
 
-		rootDomain, err := model.AssetRootDomainFirstOrCreate(domain.Domain, org.ProxyRecord().Id)
+		rootDomain, err := model.RootDomainFirstOrCreate(domain.Domain)
 		if err != nil {
-			log.Println("unable to find or create root domain", err)
+			log.Println("cant find root domain", err)
 			continue
 		}
-		//rootDomain.Set("domain", domain.Domain)
 
-		err = rootDomain.Save()
+		log.Println("Found root domain", rootDomain.DomainName())
+
+		if rootDomain.ProxyRecord().Id == "" {
+			err = rootDomain.Save()
+			if err != nil {
+				log.Println("unable to save root domain", err)
+				continue
+			}
+		}
+
+		orgRootDomain, err := model.OrgRootDomainFirstOrCreate(rootDomain.ProxyRecord().Id, org.ProxyRecord().Id)
+		if err != nil {
+			log.Println("unable to find or create root domain", rootDomain.ProxyRecord().Id, org.ProxyRecord().Id, err)
+			continue
+		}
+
+		orgRootDomain.SetRegistrar(domain.Registrar)
+		orgRootDomain.SetLastSeen(time.Now())
+
+		err = orgRootDomain.Save()
 		if err != nil {
 			log.Println("err saving root domain", err)
 		}

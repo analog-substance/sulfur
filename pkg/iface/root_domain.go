@@ -2,11 +2,9 @@ package iface
 
 import "github.com/pocketbase/pocketbase/core"
 
-type AssetRootDomain interface {
-	Registrar() string
+type RootDomain interface {
 	DomainName() string
 	DNSRecords() []DNSRecord
-	//SubDomains() []AssetRootDomain
 	Save() error
 	ProxyRecord() *core.Record
 }

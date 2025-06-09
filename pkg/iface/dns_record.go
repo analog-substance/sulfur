@@ -11,7 +11,7 @@ type DNSRecord interface {
 	SetValue(string)
 	SetType(string)
 	SetTTL(time.Duration)
-	SetRootDomain(domain AssetRootDomain)
+	SetRootDomain(domain RootDomain)
 
 	SetResolveErr(resolveErr string)
 	SetResolveErrCount(errCount int)
@@ -22,7 +22,7 @@ type DNSRecord interface {
 	Value() string
 	Type() string
 	TTL() time.Duration
-	RootDomain() AssetRootDomain
+	RootDomain() RootDomain
 	ResolveError() string
 	ResolveErrorCount() string
 	LastResolved() types.DateTime
