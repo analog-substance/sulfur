@@ -85,7 +85,6 @@ func ResolveDomains() {
 						log.Println("failed to save IP", err)
 					}
 				}
-
 			}
 		}
 	}

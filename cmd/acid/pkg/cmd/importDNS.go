@@ -7,7 +7,7 @@ import (
 // importDNSCmd represents the add command
 var importDNSCmd = &cobra.Command{
 	Use:   "dns",
-	Short: "import DNS reccords",
+	Short: "import DNS records",
 	Long: `For example:
 
 	acid import dns --json dns.json

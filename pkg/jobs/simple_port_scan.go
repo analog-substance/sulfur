@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"fmt"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/projectdiscovery/goflags"
@@ -17,6 +18,67 @@ type SimplePortScanResults struct {
 }
 
 func SimplePortScan() {
+	domainsToResolve, err := model.GetSimplePortScanInput()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	total := len(domainsToResolve)
+	log.Printf("total ips to scan: %v\n", total)
+
+	hosts := goflags.StringSlice{}
+
+	for _, record := range domainsToResolve {
+		hosts = append(hosts, record.Host)
+	}
+
+	scaRes, err := RunScan(hosts)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, hr := range scaRes {
+
+		ipAddrStr := hr.Host
+		ipAddr, err := model.IPAddressFirstOrCreate(ipAddrStr)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		if ipAddr.ProxyRecord().Id == "" {
+			err = ipAddr.Save()
+			if err != nil {
+				log.Println("unable to save new ip", err)
+				continue
+			}
+		}
+
+		for _, v := range hr.Ports {
+			r, err := model.IPPortFirstOrCreate(ipAddr.ProxyRecord().Id, v.Port, v.Protocol.String())
+			if err != nil {
+				log.Println("error saving ip port combo", err)
+				continue
+			}
+
+			r.SetLastSeen(time.Now())
+			err = r.Save()
+			if err != nil {
+				log.Println("FAILED TO SAVE RECORD", ipAddr.Address(), err)
+				continue
+			}
+
+			ipAddr.SetLastSimplePortScan(time.Now())
+			if err := ipAddr.Save(); err != nil {
+				log.Println("Error updating last scan date", err)
+			}
+		}
+	}
+}
+
+func SimplePortScanWorkers() {
 	domainsToResolve, err := model.GetSimplePortScanInput()
 	if err != nil {
 		log.Println(err)
@@ -75,27 +137,49 @@ func SimplePortScan() {
 
 func PortScanWorker(input chan *SimplePortScanResults, output chan *SimplePortScanResults) {
 	for scanRes := range input {
-		options := runner.Options{
-			Host:     goflags.StringSlice{scanRes.IPAddrRecord.Address()},
-			ScanType: "c",
-			OnResult: func(hr *result.HostResult) {
-				scanRes.HostResults = hr
-				output <- scanRes
-			},
-			Ports:   "80,443",
-			Silent:  true,
-			Timeout: 45 * time.Second,
-		}
-
-		naabuRunner, err := runner.NewRunner(&options)
+		hr, err := RunScan(goflags.StringSlice{scanRes.IPAddrRecord.Address()})
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
-		defer naabuRunner.Close()
-
-		err = naabuRunner.RunEnumeration(context.Background())
-		if err != nil {
-			log.Println("error running port scan", err, scanRes.IPAddrRecord.Address())
-		}
+		scanRes.HostResults = hr[0]
+		output <- scanRes
 	}
+}
+
+func RunScan(hosts goflags.StringSlice) ([]*result.HostResult, error) {
+	var hostResults []*result.HostResult
+
+	options := runner.Options{
+		Host:               hosts,
+		InputReadTimeout:   500 * time.Millisecond,
+		Stream:             true,
+		DisableStdin:       true,
+		DisableUpdateCheck: true,
+		ScanType:           "c",
+		OnResult: func(hr *result.HostResult) {
+			hostResults = append(hostResults, hr)
+		},
+		Ports:   "80,443",
+		Silent:  true,
+		Timeout: 500 * time.Millisecond,
+
+		Retries: 0,
+		//Debug:   true,
+		//Verbose: true,
+	}
+
+	naabuRunner, err := runner.NewRunner(&options)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer naabuRunner.Close()
+
+	err = naabuRunner.RunEnumeration(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("DONE SCANNING WITH NAABU")
+
+	return hostResults, nil
 }

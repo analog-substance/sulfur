@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"github.com/analog-substance/sulfur/pkg/app_state"
+	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"log"
 	"strings"
@@ -14,12 +15,12 @@ import (
 )
 
 type CheckCertStatus struct {
-	IPPort model.IPPort
+	IPPort iface.IPPort
 	Domain string
 	Certs  []*x509.Certificate
 }
 
-func CheckCert(domain string, ipPort model.IPPort, c chan CheckCertStatus) {
+func CheckCert(domain string, ipPort iface.IPPort, c chan CheckCertStatus) {
 
 	if strings.HasPrefix(domain, "*.") {
 		domain = fmt.Sprintf("s%d.%s", time.Now().UnixMilli(), domain[2:])
@@ -100,17 +101,13 @@ func CheckCerts() {
 						log.Println("failed to save cert: ", err, cert.Subject, cert.Issuer, cert.DNSNames, cert.EmailAddresses)
 					}
 
-					portCert, err := model.IPPortCertificateFirstOrCreate(result[i].IPPort.ProxyRecord().Id, certRecord.ProxyRecord().Id)
-					if err != nil {
+					if portCert, err := model.IPPortCertificateFirstOrCreate(result[i].IPPort.ProxyRecord().Id, certRecord.ProxyRecord().Id); err != nil {
 						log.Println("failed to create port cert: ", err)
 						continue
-					}
-
-					if err := portCert.Save(); err != nil {
+					} else if err := portCert.Save(); err != nil {
 						log.Println("failed to save port cert: ", err)
 						continue
 					}
-
 				}
 			}
 		}

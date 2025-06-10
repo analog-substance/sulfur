@@ -149,15 +149,44 @@ func GetIPsWithPorts(ports ...int) ([]iface.IPPort, error) {
 const SQLCertQueue = `
 SELECT ip_ports.* 
 FROM ip_ports
-LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id
+INNER JOIN ip_addresses on ip_addresses.id = ip_ports.ip_address AND ip_addresses.updated > datetime('now', '-8 hours')
+LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id 
 WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443
 `
 
-func GetCertsQueue() ([]IPPort, error) {
-	accounts := []IPPort{}
+type ipPortRecords struct {
+	Id string `db:"id"`
+}
+
+func GetCertsQueue() ([]iface.IPPort, error) {
+	ipPorts := []ipPortRecords{}
 	err := app_state.GetApp().DB().
 		NewQuery(SQLCertQueue).
-		All(&accounts)
+		All(&ipPorts)
 
-	return accounts, err
+	ret := []iface.IPPort{}
+	idStr := ""
+	for _, port := range ipPorts {
+		if len(idStr) > 0 {
+			idStr += ","
+		}
+		idStr += fmt.Sprintf(`"%s"`, port.Id)
+	}
+
+	// retrieve multiple "articles" records with optional dbx expressions
+	records, err := app_state.GetApp().FindAllRecords(IPPortCollection,
+		dbx.NewExp(fmt.Sprintf("id in (%s)", idStr)),
+	)
+
+	for _, record := range records {
+
+		// load into proxy
+		ipPort := &IPPort{}
+		ipPort.SetProxyRecord(record)
+
+		ret = append(ret, ipPort)
+
+	}
+
+	return ret, err
 }

@@ -226,9 +226,9 @@ func GetSimplePortScanInput() ([]DNSScope, error) {
 		NewQuery("SELECT dns_records.value host FROM dns_records " +
 			"LEFT JOIN ip_addresses ON dns_records.value=ip_addresses.address " +
 			"WHERE type = 'A' " +
-			"AND (ip_addresses.id IS NULL or ip_addresses.last_simple_port_scan <datetime('now', '-4 hours')) " +
-			"AND dns_records.id in (" +
-			"SELECT dns_records.id WHERE type = 'A' AND " +
+			"AND (ip_addresses.id IS NULL or ip_addresses.last_simple_port_scan < datetime('now', '-4 hours')) " +
+			"AND dns_records.name in (" +
+			"SELECT dns_records.name WHERE type = 'A' AND " +
 			"(last_resolved IS NOT NULL AND last_resolved > datetime('now', '-8 hours')))" +
 			"GROUP BY dns_records.value",
 		).

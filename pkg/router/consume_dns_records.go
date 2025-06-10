@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"github.com/analog-substance/sulfur/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/pocketbase/pocketbase/core"
 	"io"
 	"log"
@@ -10,15 +11,8 @@ import (
 	"time"
 )
 
-type dnsRecord struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-	Type  string `json:"type"`
-	TTL   int    `json:"ttl"`
-}
-
 func consumeDNSRecord(e *core.RequestEvent) error {
-	records := []dnsRecord{}
+	records := []sulfur.DNSRecord{}
 	jsonBytes, err := io.ReadAll(e.Request.Body)
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid request body")

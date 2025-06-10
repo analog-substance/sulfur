@@ -5,11 +5,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/analog-substance/sulfur/cmd/acid/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 )
+
+func New(apiEndpoint string) *APIClient {
+	return &APIClient{URL: apiEndpoint}
+}
+
+type APIClient struct {
+	URL string
+}
+
+func (a *APIClient) PostJSON(path string, body []byte) (*http.Response, error) {
+	return http.Post(fmt.Sprintf("%s%s", a.URL, path), "application/json", bytes.NewBuffer(body))
+}
+
+func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) {
+	body, err := json.Marshal(domainsToImport)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	resp, err := a.PostJSON(sulfur.ConsumeDNSRecordsPath, body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+	log.Println(resp.StatusCode)
+}
 
 func AddCIDR(org string, cidr *model.CIDR) {
 

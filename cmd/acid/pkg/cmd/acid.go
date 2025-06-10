@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/analog-substance/sulfur/cmd/acid/pkg/sulfur"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -9,14 +10,15 @@ import (
 )
 
 var cfgFile string
+var sulfurAPIClient *sulfur.APIClient
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "acid",
-	Short: "manage Sulfur",
+	Short: "get data into Sulfur",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-
+		sulfurAPIClient = sulfur.New(viper.GetString("api-endpoint"))
 	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -41,10 +43,11 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	//RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.scopious.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sulfur.yaml)")
 	//RootCmd.PersistentFlags().Bool("debug", false, "Debug mode")
 
 	RootCmd.PersistentFlags().String("org", "", "org id")
+	RootCmd.PersistentFlags().String("url", "", "URL to use as api endpoint")
 	//RootCmd.PersistentFlags().StringP("scope", "s", scopious.DefaultScope, "Scope name")
 
 	//rootCmd.PersistentFlags().String("domains-file", "scope-domains.txt", "where in-scope domains are located.")
@@ -52,8 +55,8 @@ func init() {
 	//rootCmd.PersistentFlags().String("ignore-domains", "ignore-scope-domains.txt", "where out-of-scope IP addresses are located.")
 	//rootCmd.PersistentFlags().String("ignore-ips", "ignore-scope-ips.txt", "where out-of-scope domains addresses are located.")
 
-	//viper.BindPFlag("scope-dir", RootCmd.PersistentFlags().Lookup("scope-dir"))
-	//viper.BindPFlag("ips-file", rootCmd.PersistentFlags().Lookup("ips-file"))
+	viper.BindPFlag("organization", RootCmd.PersistentFlags().Lookup("org"))
+	viper.BindPFlag("api-endpoint", RootCmd.PersistentFlags().Lookup("url"))
 	//viper.BindPFlag("ignore-domains", rootCmd.PersistentFlags().Lookup("ignore-domains"))
 	//viper.BindPFlag("ignore-ips", rootCmd.PersistentFlags().Lookup("ignore-ips"))
 
@@ -76,7 +79,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".scopious" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".scopious")
+		viper.SetConfigName(".sulfur")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
