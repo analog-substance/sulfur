@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -22,5 +21,5 @@ type Certificate interface {
 	SetIssued(lastSeen time.Time)
 	Expires() types.DateTime
 	SetExpires(lastSeen time.Time)
-	ProxyRecord() *core.Record
+	Id() string
 }

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -15,19 +14,7 @@ const CertificateCollection = "certificates"
 var _ core.RecordProxy = (*Certificate)(nil)
 
 type Certificate struct {
-	core.BaseRecordProxy
-}
-
-func (a *Certificate) Save() error {
-	return app_state.GetApp().Save(a)
-}
-
-func (a *Certificate) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *Certificate) Updated() types.DateTime {
-	return a.GetDateTime("updated")
+	SulfurRecordProxy
 }
 
 func (a *Certificate) Fingerprint() string {
