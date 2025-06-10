@@ -48,7 +48,7 @@ func SimplePortScan() {
 			continue
 		}
 
-		if ipAddr.ProxyRecord().Id == "" {
+		if ipAddr.Id() == "" {
 			err = ipAddr.Save()
 			if err != nil {
 				log.Println("unable to save new ip", err)
@@ -57,7 +57,7 @@ func SimplePortScan() {
 		}
 
 		for _, v := range hr.Ports {
-			r, err := model.IPPortFirstOrCreate(ipAddr.ProxyRecord().Id, v.Port, v.Protocol.String())
+			r, err := model.IPPortFirstOrCreate(ipAddr.Id(), v.Port, v.Protocol.String())
 			if err != nil {
 				log.Println("error saving ip port combo", err)
 				continue
@@ -113,7 +113,7 @@ func SimplePortScanWorkers() {
 		result[i] = <-output
 		for _, v := range result[i].HostResults.Ports {
 
-			r, err := model.IPPortFirstOrCreate(result[i].IPAddrRecord.ProxyRecord().Id, v.Port, v.Protocol.String())
+			r, err := model.IPPortFirstOrCreate(result[i].IPAddrRecord.Id(), v.Port, v.Protocol.String())
 			if err != nil {
 				log.Println("error saving ip port combo", err)
 				continue
@@ -178,8 +178,6 @@ func RunScan(hosts goflags.StringSlice) ([]*result.HostResult, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("DONE SCANNING WITH NAABU")
 
 	return hostResults, nil
 }

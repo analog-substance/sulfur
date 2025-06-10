@@ -101,7 +101,7 @@ func CheckCerts() {
 						log.Println("failed to save cert: ", err, cert.Subject, cert.Issuer, cert.DNSNames, cert.EmailAddresses)
 					}
 
-					if portCert, err := model.IPPortCertificateFirstOrCreate(result[i].IPPort.ProxyRecord().Id, certRecord.Id()); err != nil {
+					if portCert, err := model.IPPortCertificateFirstOrCreate(result[i].IPPort.Id(), certRecord.Id()); err != nil {
 						log.Println("failed to create port cert: ", err)
 						continue
 					} else if err := portCert.Save(); err != nil {

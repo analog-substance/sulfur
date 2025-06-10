@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -24,7 +23,7 @@ type IPPort interface {
 	SetProtocol(val string)
 	LastSeen() types.DateTime
 	SetLastSeen(lastSeen time.Time)
-	ProxyRecord() *core.Record
+	Id() string
 
 	GetIP() IPAddress
 }

@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -16,5 +15,5 @@ type IPPortCertificate interface {
 	SetCertificate(val string)
 	LastSeen() types.DateTime
 	SetLastSeen(lastSeen time.Time)
-	ProxyRecord() *core.Record
+	Id() string
 }

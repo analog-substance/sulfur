@@ -45,7 +45,7 @@ func consumeAssetRootDomains(e *core.RequestEvent) error {
 
 		log.Println("Found root domain", rootDomain.DomainName())
 
-		if rootDomain.ProxyRecord().Id == "" {
+		if rootDomain.Id() == "" {
 			err = rootDomain.Save()
 			if err != nil {
 				log.Println("unable to save root domain", err)
@@ -53,9 +53,9 @@ func consumeAssetRootDomains(e *core.RequestEvent) error {
 			}
 		}
 
-		orgRootDomain, err := model.OrgRootDomainFirstOrCreate(rootDomain.ProxyRecord().Id, org.ProxyRecord().Id)
+		orgRootDomain, err := model.OrgRootDomainFirstOrCreate(rootDomain.Id(), org.Id())
 		if err != nil {
-			log.Println("unable to find or create root domain", rootDomain.ProxyRecord().Id, org.ProxyRecord().Id, err)
+			log.Println("unable to find or create root domain", rootDomain.Id(), org.Id(), err)
 			continue
 		}
 

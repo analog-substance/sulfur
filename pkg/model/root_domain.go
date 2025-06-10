@@ -5,7 +5,6 @@ import (
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
 	"golang.org/x/net/publicsuffix"
 	"strings"
 )
@@ -16,11 +15,7 @@ const RootDomainCollection = "root_domains"
 var _ core.RecordProxy = (*RootDomain)(nil)
 
 type RootDomain struct {
-	core.BaseRecordProxy
-}
-
-func (a *RootDomain) Save() error {
-	return app_state.GetApp().Save(a)
+	SulfurRecordProxy
 }
 
 func (a *RootDomain) DomainName() string {
@@ -39,14 +34,6 @@ func (a *RootDomain) DNSRecords() []iface.DNSRecord {
 //func (a *RootDomain) SubDomains() (domains []*RootDomain) {
 //	return domains
 //}
-
-func (a *RootDomain) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *RootDomain) Updated() types.DateTime {
-	return a.GetDateTime("updated")
-}
 
 func FindRootDomain(domain string) (iface.RootDomain, error) {
 	rootDomain, err := ToRootDomain(domain)

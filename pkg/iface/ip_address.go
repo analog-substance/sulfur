@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -38,7 +37,7 @@ type IPAddress interface {
 	SetLastSeen(lastSeen time.Time)
 	LastSimplePortScan() types.DateTime
 	SetLastSimplePortScan(lastScan time.Time)
-	ProxyRecord() *core.Record
+	Id() string
 
 	GetDomains() []string
 	GetDNSRecords() ([]DNSRecord, error)

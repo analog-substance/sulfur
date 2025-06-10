@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -15,19 +14,7 @@ const IPPortCertificateCollection = "ip_port_certificates"
 var _ core.RecordProxy = (*IPPortCertificate)(nil)
 
 type IPPortCertificate struct {
-	core.BaseRecordProxy
-}
-
-func (a *IPPortCertificate) Save() error {
-	return app_state.GetApp().Save(a)
-}
-
-func (a *IPPortCertificate) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *IPPortCertificate) Updated() types.DateTime {
-	return a.GetDateTime("updated")
+	SulfurRecordProxy
 }
 
 func (a *IPPortCertificate) IPPort() string {

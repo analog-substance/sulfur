@@ -39,7 +39,7 @@ func consumeDNSRecord(e *core.RequestEvent) error {
 			continue
 		}
 
-		if rootDomain.ProxyRecord().Id == "" {
+		if rootDomain.Id() == "" {
 			err = rootDomain.Save()
 			if err != nil {
 				log.Println("unable to save root domain", err)

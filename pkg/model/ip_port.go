@@ -18,19 +18,7 @@ const IPPortCollection = "ip_ports"
 var _ core.RecordProxy = (*IPPort)(nil)
 
 type IPPort struct {
-	core.BaseRecordProxy
-}
-
-func (a *IPPort) Save() error {
-	return app_state.GetApp().Save(a)
-}
-
-func (a *IPPort) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *IPPort) Updated() types.DateTime {
-	return a.GetDateTime("updated")
+	SulfurRecordProxy
 }
 
 func (a *IPPort) IPAddress() string {

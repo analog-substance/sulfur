@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -13,8 +12,8 @@ type OrgRootDomain interface {
 	DNSRecords() []DNSRecord
 	LastSeen() types.DateTime
 	SetLastSeen(lastSeen time.Time)
-	
+
 	//SubDomains() []OrgRootDomain
 	Save() error
-	ProxyRecord() *core.Record
+	Id() string
 }

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -16,19 +15,7 @@ const IPAddressesCollection = "ip_addresses"
 var _ core.RecordProxy = (*IPAddress)(nil)
 
 type IPAddress struct {
-	core.BaseRecordProxy
-}
-
-func (a *IPAddress) Save() error {
-	return app_state.GetApp().Save(a)
-}
-
-func (a *IPAddress) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *IPAddress) Updated() types.DateTime {
-	return a.GetDateTime("updated")
+	SulfurRecordProxy
 }
 
 func (a *IPAddress) Address() string {
@@ -150,7 +137,7 @@ func (a *IPAddress) GetDomains() []string {
 		log.Println("Error getting DNS records:", err)
 		return ret
 	}
-	
+
 	for _, dnsRecord := range dnsRecords {
 		ret = append(ret, dnsRecord.Name())
 	}

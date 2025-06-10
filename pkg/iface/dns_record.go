@@ -1,7 +1,6 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"time"
 )
@@ -30,5 +29,5 @@ type DNSRecord interface {
 	Created() types.DateTime
 	Updated() types.DateTime
 	Save() error
-	ProxyRecord() *core.Record
+	Id() string
 }

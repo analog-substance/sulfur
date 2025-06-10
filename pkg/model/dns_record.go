@@ -16,11 +16,7 @@ const DNSRecordCollection = "dns_records"
 var _ core.RecordProxy = (*DNSRecord)(nil)
 
 type DNSRecord struct {
-	core.BaseRecordProxy
-}
-
-func (a *DNSRecord) Save() error {
-	return app_state.GetApp().Save(a)
+	SulfurRecordProxy
 }
 
 func (a *DNSRecord) RootDomain() iface.RootDomain {
@@ -59,14 +55,6 @@ func (a *DNSRecord) LastSeen() types.DateTime {
 	return a.GetDateTime("last_seen")
 }
 
-func (a *DNSRecord) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *DNSRecord) Updated() types.DateTime {
-	return a.GetDateTime("updated")
-}
-
 func (a *DNSRecord) SetName(name string) {
 	a.Set("name", name)
 }
@@ -84,7 +72,7 @@ func (a *DNSRecord) SetType(recordType string) {
 }
 
 func (a *DNSRecord) SetRootDomain(domain iface.RootDomain) {
-	a.Set("root_domain", domain.ProxyRecord().Id)
+	a.Set("root_domain", domain.Id())
 }
 
 func (a *DNSRecord) SetResolveErr(resolveErr string) {

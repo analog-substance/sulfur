@@ -17,11 +17,7 @@ const OrgRootDomainCollection = "org_domains"
 var _ core.RecordProxy = (*OrgRootDomain)(nil)
 
 type OrgRootDomain struct {
-	core.BaseRecordProxy
-}
-
-func (a *OrgRootDomain) Save() error {
-	return app_state.GetApp().Save(a)
+	SulfurRecordProxy
 }
 
 func (a *OrgRootDomain) Registrar() string {
@@ -48,14 +44,6 @@ func (a *OrgRootDomain) DNSRecords() []iface.DNSRecord {
 //func (a *RootDomain) SubDomains() (domains []*RootDomain) {
 //	return domains
 //}
-
-func (a *OrgRootDomain) Created() types.DateTime {
-	return a.GetDateTime("created")
-}
-
-func (a *OrgRootDomain) Updated() types.DateTime {
-	return a.GetDateTime("updated")
-}
 
 func (a *OrgRootDomain) SetRegistrar(registrar string) {
 	a.Set("registrar", registrar)
