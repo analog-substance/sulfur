@@ -47,7 +47,7 @@ func init() {
 	//RootCmd.PersistentFlags().Bool("debug", false, "Debug mode")
 
 	RootCmd.PersistentFlags().String("org", "", "org id")
-	RootCmd.PersistentFlags().String("url", "", "URL to use as api endpoint")
+	RootCmd.PersistentFlags().String("url", "http://127.0.0.1:8090", "URL to use as api endpoint")
 	//RootCmd.PersistentFlags().StringP("scope", "s", scopious.DefaultScope, "Scope name")
 
 	//rootCmd.PersistentFlags().String("domains-file", "scope-domains.txt", "where in-scope domains are located.")

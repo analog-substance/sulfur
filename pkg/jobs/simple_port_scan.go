@@ -158,7 +158,7 @@ func RunScan(hosts goflags.StringSlice) ([]*result.HostResult, error) {
 		OnResult: func(hr *result.HostResult) {
 			hostResults = append(hostResults, hr)
 		},
-		Ports:   "80,443",
+		Ports:   "443",
 		Silent:  true,
 		Timeout: 500 * time.Millisecond,
 

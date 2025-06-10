@@ -16,4 +16,4 @@ dist/
 sulfur_static
 /sulfur
 test-payloads
-pb_data
+pb_data*

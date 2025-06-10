@@ -26,6 +26,15 @@ go install github.com/analog-substance/sulfur@latest
 
 ## Developing and Testing
 
+### Acid command
+
+
+Resolve and import dns records
+```bash
+cat domain-list.txt | acid import domain
+```
+
+
 ### Create new DNS records
 ```bash
  curl -X POST http://localhost:8090/consume/dns_records --data '[{"name":"test_admin.nowhere.com","value":"asd","type":"A","ttl":300}]'
