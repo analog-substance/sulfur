@@ -1,7 +1,6 @@
 package jobs
 
 import (
-	"fmt"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/projectdiscovery/goflags"
