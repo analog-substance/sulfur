@@ -25,4 +25,6 @@ type IPPort interface {
 	LastSeen() types.DateTime
 	SetLastSeen(lastSeen time.Time)
 	ProxyRecord() *core.Record
+
+	GetIP() IPAddress
 }

@@ -51,12 +51,15 @@ func ResolveDomains() {
 			for _, v := range result[i].Value {
 				r, err := model.DNSRecordFirstOrCreate(result[i].Name, v, "A")
 				if err != nil {
-					log.Println(err)
+					log.Println("error creating dns record", err, result[i].Name, v)
 					continue
 				}
 
 				r.SetLastResolved(time.Now())
 				r.SetResolveErr("")
+				if err := r.Save(); err != nil {
+					log.Println("FAILED TO SAVE RECORD", result[i].Name, err)
+				}
 
 				parsedIP := net.ParseIP(v)
 				if parsedIP != nil {
@@ -83,10 +86,6 @@ func ResolveDomains() {
 					}
 				}
 
-				err = r.Save()
-				if err != nil {
-					log.Println("FAILED TO SAVE RECORD", result[i].Name, err)
-				}
 			}
 		}
 	}

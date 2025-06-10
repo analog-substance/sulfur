@@ -11,6 +11,7 @@ func AddJobs() {
 	//slog.SetLogLoggerLevel(slog.LevelInfo)
 	AddJob("resolve domains", "*/1 * * * *", ResolveDomains)
 	AddJob("Simple Port Scan", "*/1 * * * *", SimplePortScan)
+	AddJob("Check Certs", "*/1 * * * *", CheckCerts)
 }
 
 var jobsMap = map[string]time.Time{}

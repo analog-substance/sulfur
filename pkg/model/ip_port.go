@@ -1,11 +1,14 @@
 package model
 
 import (
+	"fmt"
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
+	"log"
+	"strconv"
 	"time"
 )
 
@@ -79,6 +82,21 @@ func (a *IPPort) SetLastSeen(lastSeen time.Time) {
 	a.Set("last_seen", lastSeen)
 }
 
+func (a *IPPort) GetIP() iface.IPAddress {
+
+	coreRecord, err := FindRecordByID(IPAddressesCollection, a.IPAddress())
+	if err != nil {
+		log.Println("failed to get IP", err)
+		return nil
+	}
+
+	// load into proxy
+	obj := &IPAddress{}
+	obj.SetProxyRecord(coreRecord)
+
+	return obj
+}
+
 func IPPortFirstOrCreate(ipAddrId string, port int, protocol string) (iface.IPPort, error) {
 	ipPort := &IPPort{}
 
@@ -98,4 +116,48 @@ func IPPortFirstOrCreate(ipAddrId string, port int, protocol string) (iface.IPPo
 	}
 	ipPort.SetProxyRecord(record)
 	return ipPort, nil
+}
+
+func GetIPsWithPorts(ports ...int) ([]iface.IPPort, error) {
+	ret := []iface.IPPort{}
+	portStr := ""
+	for _, port := range ports {
+		if len(portStr) > 0 {
+			portStr += ","
+		}
+		portStr = portStr + strconv.Itoa(port)
+	}
+
+	// retrieve multiple "articles" records with optional dbx expressions
+	records, err := app_state.GetApp().FindAllRecords(IPPortCollection,
+		dbx.NewExp(fmt.Sprintf("port in (%s)", portStr)),
+	)
+
+	for _, record := range records {
+
+		// load into proxy
+		ipPort := &IPPort{}
+		ipPort.SetProxyRecord(record)
+
+		ret = append(ret, ipPort)
+
+	}
+
+	return ret, err
+}
+
+const SQLCertQueue = `
+SELECT ip_ports.* 
+FROM ip_ports
+LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id
+WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443
+`
+
+func GetCertsQueue() ([]IPPort, error) {
+	accounts := []IPPort{}
+	err := app_state.GetApp().DB().
+		NewQuery(SQLCertQueue).
+		All(&accounts)
+
+	return accounts, err
 }

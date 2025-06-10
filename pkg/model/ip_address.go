@@ -6,6 +6,7 @@ import (
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
+	"log"
 	"time"
 )
 
@@ -139,6 +140,28 @@ func (a *IPAddress) LastSimplePortScan() types.DateTime {
 
 func (a *IPAddress) SetLastSimplePortScan(lastScan time.Time) {
 	a.Set("last_simple_port_scan", lastScan)
+}
+
+func (a *IPAddress) GetDomains() []string {
+
+	ret := []string{}
+	dnsRecords, err := a.GetDNSRecords()
+	if err != nil {
+		log.Println("Error getting DNS records:", err)
+		return ret
+	}
+	
+	for _, dnsRecord := range dnsRecords {
+		ret = append(ret, dnsRecord.Name())
+	}
+
+	return ret
+}
+
+func (a *IPAddress) GetDNSRecords() ([]iface.DNSRecord, error) {
+
+	return GetDNSRecordsForIP(a.Address())
+
 }
 
 func IPAddressFirstOrCreate(ipAddr string) (iface.IPAddress, error) {

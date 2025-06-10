@@ -138,21 +138,74 @@ func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.D
 	return dnsR, nil
 }
 
+func GetDNSRecordsForIP(ipAddress string) ([]iface.DNSRecord, error) {
+
+	ret := []iface.DNSRecord{}
+	// retrieve multiple "articles" records with optional dbx expressions
+	records, err := app_state.GetApp().FindAllRecords(DNSRecordCollection,
+		dbx.NewExp("value = {:ip_address}", dbx.Params{"ip_address": ipAddress}),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	for _, record := range records {
+
+		// load into proxy
+		dnsRecord := &DNSRecord{}
+		dnsRecord.SetProxyRecord(record)
+
+		ret = append(ret, dnsRecord)
+
+	}
+
+	return ret, nil
+}
+
 type DNSScope struct {
 	Host string `db:"host" json:"host"`
 }
 
+const SQLARecordResolveQueue = `
+SELECT dns_records.name host
+FROM dns_records
+WHERE dns_records.name NOT IN (
+	SELECT dns_records.name
+	FROM dns_records
+	WHERE type = 'A' AND (
+		(last_resolved IS NULL OR last_resolved > datetime('now', '-4 hours'))
+		OR (resolve_error IS NOT NULL OR resolve_error != '')
+	)
+	GROUP BY dns_records.name
+) AND type = 'A' AND (
+		(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours'))
+		OR (resolve_error IS NOT NULL OR resolve_error != '')
+	)
+GROUP BY dns_records.name
+`
+
+const SQLAddrResolveQueue = `
+SELECT dns_records.value host
+FROM dns_records
+WHERE dns_records.value NOT IN (
+	SELECT dns_records.value
+	FROM dns_records
+	WHERE type = 'A' AND (
+		(last_resolved IS NULL OR last_resolved > datetime('now', '-4 hours'))
+		OR (resolve_error IS NOT NULL OR resolve_error != '')
+	)
+	GROUP BY dns_records.value
+) AND type = 'A' AND (
+		(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours'))
+		OR (resolve_error IS NOT NULL OR resolve_error != '')
+	)
+GROUP BY dns_records.value
+`
+
 func GetARecordsToResolve() ([]DNSScope, error) {
 	accounts := []DNSScope{}
 	err := app_state.GetApp().DB().
-		NewQuery("SELECT dns_records.name host FROM dns_records " +
-			"WHERE type = 'A' " +
-			"AND dns_records.id in (" +
-			"SELECT dns_records.id WHERE type = 'A' AND  " +
-			"(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours') or last_resolved < updated)" +
-			"OR (resolve_error IS NOT NULL))" +
-			"GROUP BY dns_records.name",
-		).
+		NewQuery(SQLARecordResolveQueue).
 		All(&accounts)
 
 	return accounts, err
@@ -161,13 +214,7 @@ func GetARecordsToResolve() ([]DNSScope, error) {
 func GetActiveIPs() ([]DNSScope, error) {
 	accounts := []DNSScope{}
 	err := app_state.GetApp().DB().
-		NewQuery("SELECT dns_records.value host FROM dns_records " +
-			"WHERE type = 'A' " +
-			"AND dns_records.id in (" +
-			"SELECT dns_records.id WHERE type = 'A' AND  " +
-			"(last_resolved IS NOT NULL AND last_resolved > datetime('now', '-8 hours')))" +
-			"GROUP BY dns_records.value",
-		).
+		NewQuery(SQLAddrResolveQueue).
 		All(&accounts)
 
 	return accounts, err

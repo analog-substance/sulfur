@@ -39,4 +39,7 @@ type IPAddress interface {
 	LastSimplePortScan() types.DateTime
 	SetLastSimplePortScan(lastScan time.Time)
 	ProxyRecord() *core.Record
+
+	GetDomains() []string
+	GetDNSRecords() ([]DNSRecord, error)
 }

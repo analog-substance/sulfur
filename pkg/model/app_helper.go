@@ -43,3 +43,13 @@ func FirstOrCreateByFilter(nameOrID string, filter string, params ...dbx.Params)
 	}
 	return record, nil
 }
+
+func FindRecordByID(nameOrID string, recordId string) (*core.Record, error) {
+
+	record, err := app_state.GetApp().FindRecordById(nameOrID, recordId)
+	if err != nil {
+		return nil, err
+	}
+
+	return record, nil
+}
