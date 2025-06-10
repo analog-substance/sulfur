@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func consumeDNSRecord(e *core.RequestEvent) error {
+func importDNSRecords(e *core.RequestEvent) error {
 	records := []sulfur.DNSRecord{}
 	jsonBytes, err := io.ReadAll(e.Request.Body)
 	if err != nil {

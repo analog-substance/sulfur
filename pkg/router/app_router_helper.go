@@ -7,8 +7,8 @@ import (
 
 func AttachRoutes(se *core.ServeEvent) error {
 
-	se.Router.POST(sulfur.ConsumeDNSRecordsPath, consumeDNSRecord)
-	se.Router.POST("/consume/{org_id}/assets/root_domains", consumeAssetRootDomains)
+	se.Router.POST(sulfur.ImportDNSRecordsPath, importDNSRecords)
+	se.Router.POST(sulfur.ImportOrgRootDomainsPath, importOrgRootDomains)
 
 	return se.Next()
 }

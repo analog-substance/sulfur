@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"github.com/analog-substance/sulfur/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/pocketbase/pocketbase/core"
 	"io"
 	"log"
@@ -10,12 +11,7 @@ import (
 	"time"
 )
 
-type orgRootDomainRequest struct {
-	Domain    string `json:"domain"`
-	Registrar string `json:"registrar"`
-}
-
-func consumeAssetRootDomains(e *core.RequestEvent) error {
+func importOrgRootDomains(e *core.RequestEvent) error {
 
 	orgID := e.Request.PathValue("org_id")
 
@@ -24,7 +20,7 @@ func consumeAssetRootDomains(e *core.RequestEvent) error {
 		return e.String(http.StatusNotFound, "invalid request")
 	}
 
-	domains := []orgRootDomainRequest{}
+	domains := []sulfur.OrgRootDomain{}
 	jsonBytes, err := io.ReadAll(e.Request.Body)
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid request body")

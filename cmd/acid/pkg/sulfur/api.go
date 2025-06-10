@@ -31,7 +31,25 @@ func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) {
 		return
 	}
 
-	resp, err := a.PostJSON(sulfur.ConsumeDNSRecordsPath, body)
+	resp, err := a.PostJSON(sulfur.ImportDNSRecordsPath, body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+	log.Println(resp.StatusCode)
+}
+
+func (a *APIClient) ImportOrgRootDomains(orgId string, domainsToImport []sulfur.OrgRootDomain) {
+	body, err := json.Marshal(domainsToImport)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	apiPath := strings.Replace(sulfur.ImportOrgRootDomainsPath, "{org_id}", orgId, -1)
+
+	resp, err := a.PostJSON(apiPath, body)
 	if err != nil {
 		fmt.Println(err)
 		return
