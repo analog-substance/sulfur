@@ -18,7 +18,8 @@ var RootCmd = &cobra.Command{
 	Short: "get data into Sulfur",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		sulfurAPIClient = sulfur.New(viper.GetString("api-endpoint"))
+
+		sulfurAPIClient = sulfur.New(viper.GetString("api-endpoint"), viper.GetString("api-user"), viper.GetString("api-pass"))
 	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -48,6 +49,8 @@ func init() {
 
 	RootCmd.PersistentFlags().String("org", "", "org id")
 	RootCmd.PersistentFlags().String("url", "http://127.0.0.1:8090", "URL to use as api endpoint")
+	RootCmd.PersistentFlags().String("api-user", "", "Username to use for api")
+	RootCmd.PersistentFlags().String("api-pass", "", "Password to use for api")
 	//RootCmd.PersistentFlags().StringP("scope", "s", scopious.DefaultScope, "Scope name")
 
 	//rootCmd.PersistentFlags().String("domains-file", "scope-domains.txt", "where in-scope domains are located.")
@@ -57,6 +60,8 @@ func init() {
 
 	viper.BindPFlag("organization", RootCmd.PersistentFlags().Lookup("org"))
 	viper.BindPFlag("api-endpoint", RootCmd.PersistentFlags().Lookup("url"))
+	viper.BindPFlag("api-user", RootCmd.PersistentFlags().Lookup("api-user"))
+	viper.BindPFlag("api-pass", RootCmd.PersistentFlags().Lookup("api-pass"))
 	//viper.BindPFlag("ignore-domains", rootCmd.PersistentFlags().Lookup("ignore-domains"))
 	//viper.BindPFlag("ignore-ips", rootCmd.PersistentFlags().Lookup("ignore-ips"))
 
@@ -85,7 +90,5 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	_ = viper.ReadInConfig()
 }

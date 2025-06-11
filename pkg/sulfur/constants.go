@@ -2,3 +2,6 @@ package sulfur
 
 const ImportDNSRecordsPath = "/consume/dns_records"
 const ImportOrgRootDomainsPath = "/import/org/{org_id}/assets/root_domains"
+const AuthUserPath = "/api/collections/users/auth-with-password"
+const AuthSuperUserPath = "/api/collections/_superusers/auth-with-password"
+const RootDomainSPath = "/api/collections/root_domains/records"
