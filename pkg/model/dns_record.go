@@ -161,8 +161,8 @@ WHERE dns_records.name NOT IN (
 	SELECT dns_records.name
 	FROM dns_records
 	WHERE type = 'A' AND (
-		(last_resolved IS NULL OR last_resolved > datetime('now', '-4 hours'))
-		OR (resolve_error IS NOT NULL OR resolve_error != '')
+		(last_resolved > datetime('now', '-4 hours'))
+		OR (resolve_error != '')
 	)
 	GROUP BY dns_records.name
 ) AND type = 'A' AND (
@@ -179,13 +179,12 @@ WHERE dns_records.value NOT IN (
 	SELECT dns_records.value
 	FROM dns_records
 	WHERE type = 'A' AND (
-		(last_resolved IS NULL OR last_resolved > datetime('now', '-4 hours'))
-		OR (resolve_error IS NOT NULL OR resolve_error != '')
+		last_resolved > datetime('now', '-4 hours')
 	)
 	GROUP BY dns_records.value
 ) AND type = 'A' AND (
 		(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours'))
-		OR (resolve_error IS NOT NULL OR resolve_error != '')
+		OR (resolve_error IS NOT NULL AND resolve_error != '')
 	)
 GROUP BY dns_records.value
 `
@@ -208,18 +207,19 @@ func GetActiveIPs() ([]DNSScope, error) {
 	return accounts, err
 }
 
+const SQLPortScanQueue = `
+SELECT ip_addresses.address host
+FROM ip_addresses
+         LEFT JOIN ip_ports ON ip_addresses.id=ip_ports.ip_address
+WHERE ip_addresses.is_private = false AND ip_addresses.is_shared = false
+  AND (ip_ports.id IS NULL OR ip_addresses.last_simple_port_scan < datetime('now', '-4 hours'))
+GROUP BY ip_addresses.address
+`
+
 func GetSimplePortScanInput() ([]DNSScope, error) {
 	accounts := []DNSScope{}
 	err := app_state.GetApp().DB().
-		NewQuery("SELECT dns_records.value host FROM dns_records " +
-			"LEFT JOIN ip_addresses ON dns_records.value=ip_addresses.address " +
-			"WHERE type = 'A' " +
-			"AND (ip_addresses.id IS NULL or ip_addresses.last_simple_port_scan < datetime('now', '-4 hours')) " +
-			"AND dns_records.name in (" +
-			"SELECT dns_records.name WHERE type = 'A' AND " +
-			"(last_resolved IS NOT NULL AND last_resolved > datetime('now', '-8 hours')))" +
-			"GROUP BY dns_records.value",
-		).
+		NewQuery(SQLPortScanQueue).
 		All(&accounts)
 
 	return accounts, err

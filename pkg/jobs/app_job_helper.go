@@ -26,13 +26,13 @@ func NewJob(jobId string, run func()) func() {
 	return func() {
 		//slog.SetLogLoggerLevel(slog.LevelInfo)
 
+		mu.Lock()
 		if _, ok := jobsMap[jobId]; ok {
 			app_state.GetApp().Logger().Info("Job already running", "job", jobId)
 			log.Println("Job already running", "job", jobId)
 			return
 		}
 
-		mu.Lock()
 		jobsMap[jobId] = time.Now()
 		mu.Unlock()
 		defer func() {

@@ -137,9 +137,9 @@ func GetIPsWithPorts(ports ...int) ([]iface.IPPort, error) {
 const SQLCertQueue = `
 SELECT ip_ports.* 
 FROM ip_ports
-INNER JOIN ip_addresses on ip_addresses.id = ip_ports.ip_address AND ip_addresses.updated > datetime('now', '-8 hours')
+INNER JOIN ip_addresses on ip_addresses.id = ip_ports.ip_address
 LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id 
-WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443
+WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443  AND ip_ports.last_seen > datetime('now', '-8 hours')
 `
 
 type ipPortRecords struct {

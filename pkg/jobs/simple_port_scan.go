@@ -29,6 +29,18 @@ func SimplePortScan() {
 	hosts := goflags.StringSlice{}
 
 	for _, record := range domainsToResolve {
+		ipAddr, err := model.IPAddressFirstOrCreate(record.Host)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		ipAddr.SetLastSimplePortScan(time.Now())
+		if err := ipAddr.Save(); err != nil {
+			log.Println("unable to save new ip", err)
+			continue
+		}
+
 		hosts = append(hosts, record.Host)
 	}
 
@@ -48,6 +60,7 @@ func SimplePortScan() {
 		}
 
 		if ipAddr.Id() == "" {
+			// should not happen
 			err = ipAddr.Save()
 			if err != nil {
 				log.Println("unable to save new ip", err)
@@ -69,6 +82,7 @@ func SimplePortScan() {
 				continue
 			}
 
+			// we can update the time to now.
 			ipAddr.SetLastSimplePortScan(time.Now())
 			if err := ipAddr.Save(); err != nil {
 				log.Println("Error updating last scan date", err)
