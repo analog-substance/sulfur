@@ -29,26 +29,12 @@ func importDNSRecords(e *core.RequestEvent) error {
 			log.Println("unable to find or create dns record", err)
 			continue
 		}
-		dnsr.SetTTL(time.Duration(record.TTL) * time.Second)
+
+		ttl := time.Duration(record.TTL) * time.Second
+
+		dnsr.SetTTL(ttl / time.Second)
 		dnsr.SetLastSeen(time.Now())
 		dnsr.SetLastResolved(time.Now())
-
-		rootDomain, err := model.RootDomainFirstOrCreate(record.Name)
-		if err != nil {
-			log.Println("unable to find or create root domain record", err)
-			continue
-		}
-
-		if rootDomain.Id() == "" {
-			err = rootDomain.Save()
-			if err != nil {
-				log.Println("unable to save root domain", err)
-				continue
-			}
-		}
-
-		log.Println("Found root domain", rootDomain.DomainName())
-		dnsr.SetRootDomain(rootDomain)
 
 		err = dnsr.Save()
 		if err != nil {

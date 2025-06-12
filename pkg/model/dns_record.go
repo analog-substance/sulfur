@@ -6,6 +6,8 @@ import (
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
+	"log"
+	"net"
 	"strings"
 	"time"
 )
@@ -14,6 +16,13 @@ const DNSRecordCollection = "dns_records"
 
 // ensures that the Article struct satisfy the core.RecordProxy interface
 var _ core.RecordProxy = (*DNSRecord)(nil)
+
+var sharedSpace *net.IPNet
+
+func init() {
+	_, sharedSpace, _ = net.ParseCIDR("100.64.0.0/10")
+
+}
 
 type DNSRecord struct {
 	SulfurRecordProxy
@@ -123,6 +132,46 @@ func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.D
 		return nil, err
 	}
 	dnsR.SetProxyRecord(record)
+
+	rootDomain, err := RootDomainFirstOrCreate(strings.ToLower(recordName))
+	if err == nil {
+		if rootDomain.Id() == "" {
+			err = rootDomain.Save()
+			if err != nil {
+				log.Println("unable to save root domain", err)
+			}
+		}
+
+		dnsR.SetRootDomain(rootDomain)
+	} else {
+		log.Println("unable to find or create root domain record", err)
+	}
+
+	parsedIP := net.ParseIP(recordValue)
+	if parsedIP != nil {
+		ipRecord, err := IPAddressFirstOrCreate(parsedIP.String())
+		if err != nil {
+			log.Println("failed to create ip addr", err)
+		}
+
+		ipRecord.SetIs6(parsedIP.To4() == nil)
+		// not sure what i was thinking whn i created this field....
+		//ipRecord.SetIsEphemeral(parsedIP.IsEp)
+		ipRecord.SetIsGlobalUnicast(parsedIP.IsGlobalUnicast())
+		ipRecord.SetIsInterfaceLocalMulticast(parsedIP.IsLinkLocalMulticast())
+		ipRecord.SetIsLoopback(parsedIP.IsLoopback())
+		ipRecord.SetIsLinkLocalMulticast(parsedIP.IsLinkLocalMulticast())
+		ipRecord.SetIsLinkLocalUnicast(parsedIP.IsLinkLocalUnicast())
+		ipRecord.SetIsMulticast(parsedIP.IsMulticast())
+		ipRecord.SetIsPrivate(parsedIP.IsPrivate())
+		ipRecord.SetIsShared(sharedSpace.Contains(parsedIP))
+		ipRecord.SetIsUnspecified(parsedIP.IsUnspecified())
+
+		if err := ipRecord.Save(); err != nil {
+			log.Println("failed to save IP", err)
+		}
+	}
+
 	return dnsR, nil
 }
 

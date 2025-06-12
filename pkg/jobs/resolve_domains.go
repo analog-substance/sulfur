@@ -4,7 +4,6 @@ import (
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/projectdiscovery/dnsx/libs/dnsx"
 	"log"
-	"net"
 	"time"
 )
 
@@ -25,8 +24,6 @@ func ResolveDomains() {
 		log.Println(err)
 		return
 	}
-
-	_, sharedSpace, _ := net.ParseCIDR("100.64.0.0/10")
 
 	total := len(domainsToResolve)
 	log.Printf("total records: %v\n", total)
@@ -61,30 +58,6 @@ func ResolveDomains() {
 					log.Println("FAILED TO SAVE RECORD", result[i].Name, err)
 				}
 
-				parsedIP := net.ParseIP(v)
-				if parsedIP != nil {
-					ipRecord, err := model.IPAddressFirstOrCreate(parsedIP.String())
-					if err != nil {
-						log.Println("failed to create ip addr", err)
-					}
-
-					ipRecord.SetIs6(parsedIP.To4() == nil)
-					// not sure what i was thinking whn i created this field....
-					//ipRecord.SetIsEphemeral(parsedIP.IsEp)
-					ipRecord.SetIsGlobalUnicast(parsedIP.IsGlobalUnicast())
-					ipRecord.SetIsInterfaceLocalMulticast(parsedIP.IsLinkLocalMulticast())
-					ipRecord.SetIsLoopback(parsedIP.IsLoopback())
-					ipRecord.SetIsLinkLocalMulticast(parsedIP.IsLinkLocalMulticast())
-					ipRecord.SetIsLinkLocalUnicast(parsedIP.IsLinkLocalUnicast())
-					ipRecord.SetIsMulticast(parsedIP.IsMulticast())
-					ipRecord.SetIsPrivate(parsedIP.IsPrivate())
-					ipRecord.SetIsShared(sharedSpace.Contains(parsedIP))
-					ipRecord.SetIsUnspecified(parsedIP.IsUnspecified())
-
-					if err := ipRecord.Save(); err != nil {
-						log.Println("failed to save IP", err)
-					}
-				}
 			}
 		}
 	}
