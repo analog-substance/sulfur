@@ -1,105 +1,39 @@
 package jobs
 
 import (
-	"github.com/analog-substance/sulfur/pkg/iface"
+	"errors"
+	copper "github.com/analog-substance/copper/pkg/lib"
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
-	"github.com/projectdiscovery/goflags"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/runner"
-	"golang.org/x/net/context"
-	"log"
 	"time"
 )
 
-type SimplePortScanResults struct {
-	IPAddrRecord iface.IPAddress
-	HostResults  *result.HostResult
+var portsToScan = []int{}
+
+func init() {
+	portsToScan = copper.GetTopPopularPorts("tcp", 20)
 }
 
-func SimplePortScan() {
-	domainsToResolve, err := model.GetSimplePortScanInput()
-	if err != nil {
-		log.Println(err)
-		return
-	}
+type SimplePortScanResults struct {
+	IPAddr      string
+	SimplePorts []simplePort
+}
 
-	total := len(domainsToResolve)
-	log.Printf("total ips to scan: %v\n", total)
-
-	hosts := goflags.StringSlice{}
-
-	for _, record := range domainsToResolve {
-		ipAddr, err := model.IPAddressFirstOrCreate(record.Host)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		ipAddr.SetLastSimplePortScan(time.Now())
-		if err := ipAddr.Save(); err != nil {
-			log.Println("unable to save new ip", err)
-			continue
-		}
-
-		hosts = append(hosts, record.Host)
-	}
-
-	scaRes, err := RunScan(hosts)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for _, hr := range scaRes {
-
-		ipAddrStr := hr.Host
-		ipAddr, err := model.IPAddressFirstOrCreate(ipAddrStr)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		if ipAddr.Id() == "" {
-			// should not happen
-			err = ipAddr.Save()
-			if err != nil {
-				log.Println("unable to save new ip", err)
-				continue
-			}
-		}
-
-		for _, v := range hr.Ports {
-			r, err := model.IPPortFirstOrCreate(ipAddr.Id(), v.Port, v.Protocol.String())
-			if err != nil {
-				log.Println("error saving ip port combo", err)
-				continue
-			}
-
-			r.SetLastSeen(time.Now())
-			err = r.Save()
-			if err != nil {
-				log.Println("FAILED TO SAVE RECORD", ipAddr.Address(), err)
-				continue
-			}
-
-			// we can update the time to now.
-			ipAddr.SetLastSimplePortScan(time.Now())
-			if err := ipAddr.Save(); err != nil {
-				log.Println("Error updating last scan date", err)
-			}
-		}
-	}
+type simplePort struct {
+	Port     int
+	Protocol string
 }
 
 func SimplePortScanWorkers() {
-	domainsToResolve, err := model.GetSimplePortScanInput()
+	logger := app_state.GetApp().Logger().WithGroup("SimplePortScan")
+	ipsToScan, err := model.GetSimplePortScanInput()
 	if err != nil {
-		log.Println(err)
+		logger.Error("Error getting IPs to scan", "error", err)
 		return
 	}
 
-	total := len(domainsToResolve)
-	log.Printf("total ips to scan: %v\n", total)
+	total := len(ipsToScan)
+	logger.Info("preparing to scan", "count", total)
 
 	input := make(chan *SimplePortScanResults, total)
 	output := make(chan *SimplePortScanResults, total)
@@ -108,89 +42,68 @@ func SimplePortScanWorkers() {
 		go PortScanWorker(input, output)
 	}
 
-	for _, record := range domainsToResolve {
+	queue := 0
+	for _, record := range ipsToScan {
+		queue++
+		input <- &SimplePortScanResults{
+			IPAddr:      record.Host,
+			SimplePorts: []simplePort{},
+		}
+	}
+	close(input)
+	logger.Info("queued", "count", queue)
 
-		ipAddr, err := model.IPAddressFirstOrCreate(record.Host)
+	for a := queue; a > 0; a-- {
+		portScanResult := <-output
+
+		err := SaveOpenPortsForIP(portScanResult.IPAddr, portScanResult.SimplePorts)
 		if err != nil {
-			log.Println("error getting ip", err)
+			logger.Error("Failed to save port scan results", "error", err)
 			continue
 		}
-
-		input <- &SimplePortScanResults{
-			IPAddrRecord: ipAddr,
-		}
 	}
-
-	result := make([]*SimplePortScanResults, total)
-	for i, _ := range result {
-		result[i] = <-output
-		for _, v := range result[i].HostResults.Ports {
-
-			r, err := model.IPPortFirstOrCreate(result[i].IPAddrRecord.Id(), v.Port, v.Protocol.String())
-			if err != nil {
-				log.Println("error saving ip port combo", err)
-				continue
-			}
-
-			r.SetLastSeen(time.Now())
-			err = r.Save()
-			if err != nil {
-				log.Println("FAILED TO SAVE RECORD", result[i].IPAddrRecord.Address(), err)
-				continue
-			}
-
-			result[i].IPAddrRecord.SetLastSimplePortScan(time.Now())
-			if err := result[i].IPAddrRecord.Save(); err != nil {
-				log.Println("Error updating last scan date", err)
-			}
-
-		}
-	}
+	close(output)
 }
 
 func PortScanWorker(input chan *SimplePortScanResults, output chan *SimplePortScanResults) {
 	for scanRes := range input {
-		hr, err := RunScan(goflags.StringSlice{scanRes.IPAddrRecord.Address()})
-		if err != nil {
-			log.Println(err)
+
+		openPorts := copper.GetOpenPortsOnHost(scanRes.IPAddr, portsToScan, 500)
+		for _, openPort := range openPorts {
+			scanRes.SimplePorts = append(scanRes.SimplePorts, simplePort{
+				Port:     openPort,
+				Protocol: "tcp",
+			})
 		}
-		scanRes.HostResults = hr[0]
+
 		output <- scanRes
 	}
 }
 
-func RunScan(hosts goflags.StringSlice) ([]*result.HostResult, error) {
-	var hostResults []*result.HostResult
-
-	options := runner.Options{
-		Host:               hosts,
-		InputReadTimeout:   500 * time.Millisecond,
-		Stream:             true,
-		DisableStdin:       true,
-		DisableUpdateCheck: true,
-		ScanType:           "c",
-		OnResult: func(hr *result.HostResult) {
-			hostResults = append(hostResults, hr)
-		},
-		Ports:   "443",
-		Silent:  true,
-		Timeout: 500 * time.Millisecond,
-
-		Retries: 0,
-		//Debug:   true,
-		//Verbose: true,
-	}
-
-	naabuRunner, err := runner.NewRunner(&options)
+func SaveOpenPortsForIP(ipAddrStr string, ports []simplePort) error {
+	ipAddr, err := model.IPAddressFirstOrCreate(ipAddrStr)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer naabuRunner.Close()
-
-	err = naabuRunner.RunEnumeration(context.Background())
-	if err != nil {
-		return nil, err
+		return errors.New("failed to get IP model for results: " + err.Error())
 	}
 
-	return hostResults, nil
+	// we can update the time to now.
+	ipAddr.SetLastSimplePortScan(time.Now())
+	if err := ipAddr.Save(); err != nil {
+		return errors.New("failed to update last scan date for IP: " + err.Error())
+	}
+
+	for _, v := range ports {
+		r, err := model.IPPortFirstOrCreate(ipAddr.Id(), v.Port, v.Protocol)
+		if err != nil {
+			return errors.New("failed to get IP Port model: " + err.Error())
+		}
+
+		r.SetLastSeen(time.Now())
+		err = r.Save()
+		if err != nil {
+			return errors.New("failed to save IP Port model: " + err.Error())
+		}
+
+	}
+	return nil
 }

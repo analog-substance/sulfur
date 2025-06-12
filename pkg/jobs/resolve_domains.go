@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/projectdiscovery/dnsx/libs/dnsx"
 	"log"
@@ -19,14 +20,15 @@ func init() {
 }
 
 func ResolveDomains() {
+	logger := app_state.GetApp().Logger().WithGroup("ResolveDomains")
 	domainsToResolve, err := model.GetARecordsToResolve()
 	if err != nil {
-		log.Println(err)
+		logger.Error("failed to get domain queue: ", "err", err)
 		return
 	}
 
 	total := len(domainsToResolve)
-	log.Printf("total records: %v\n", total)
+	logger.Info("records to resolve", "total", total)
 
 	input := make(chan string, total)
 	output := make(chan checkDNSStatus, total)
@@ -43,21 +45,20 @@ func ResolveDomains() {
 	for i, _ := range result {
 		result[i] = <-output
 		if result[i].Error != nil {
-			log.Println(result[i].Error)
+			logger.Error("error in resolution results", "error", result[i].Error)
 		} else {
 			for _, v := range result[i].Value {
 				r, err := model.DNSRecordFirstOrCreate(result[i].Name, v, "A")
 				if err != nil {
-					log.Println("error creating dns record", err, result[i].Name, v)
+					logger.Error("error in dns record", "error", err, "name", result[i].Name, "value", v)
 					continue
 				}
 
 				r.SetLastResolved(time.Now())
 				r.SetResolveErr("")
 				if err := r.Save(); err != nil {
-					log.Println("FAILED TO SAVE RECORD", result[i].Name, err)
+					logger.Error("Failed to save DNS record", "name", result[i].Name, "error", err)
 				}
-
 			}
 		}
 	}
