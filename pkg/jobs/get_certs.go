@@ -48,13 +48,12 @@ func CheckCerts() {
 				if !cert.IsCA {
 					fp := fmt.Sprintf("%x", sha1.Sum(cert.Raw))
 					certRecord, err := model.CertificateFirstOrCreate(fp)
-
 					if err != nil {
 						logger.Error("failed tp create cert", "error", err)
 						continue
 					}
-					certRecord.SetSubject(cert.Subject.CommonName)
-					certRecord.SetAlternativeNames(strings.Join(cert.DNSNames, ","))
+					certRecord.SetSubject(strings.ToLower(cert.Subject.CommonName))
+					certRecord.SetAlternativeNames(strings.ToLower(strings.Join(cert.DNSNames, ",")))
 					certRecord.SetIssuer(cert.Issuer.CommonName)
 					certRecord.SetIssued(cert.NotBefore)
 					certRecord.SetExpires(cert.NotAfter)
