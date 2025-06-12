@@ -29,14 +29,14 @@ func NewJob(jobId string, run func()) func() {
 		//slog.SetLogLoggerLevel(slog.LevelInfo)
 
 		if !lockJob(jobId) {
-			logger.Warn("Job status update", "job", jobId, "status", "already running")
+			logger.Warn("Job status update", "job", jobId, "status", "already running", "duration", getJobDuration(jobId).String())
 			return
 		}
 
 		defer unlockJob(jobId)
 		run()
 		duration := getJobDuration(jobId)
-		logger.Info("Job status update", "job", jobId, "status", "complete", "duration", duration)
+		logger.Info("Job status update", "job", jobId, "status", "complete", "duration", duration.String())
 	}
 }
 
