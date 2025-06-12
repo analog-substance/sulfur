@@ -1,10 +1,12 @@
 package model
 
 import (
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
+	"strings"
 	"time"
 )
 
@@ -77,4 +79,42 @@ func CertificateFirstOrCreate(fingerprint string) (iface.Certificate, error) {
 	}
 	ipPort.SetProxyRecord(record)
 	return ipPort, nil
+}
+
+func GetAllCertificates() ([]iface.Certificate, error) {
+	ret := []iface.Certificate{}
+	records, err := app_state.GetApp().FindAllRecords(CertificateCollection)
+
+	for _, record := range records {
+
+		// load into proxy
+		proxyStruct := &Certificate{}
+		proxyStruct.SetProxyRecord(record)
+
+		ret = append(ret, proxyStruct)
+
+	}
+
+	return ret, err
+}
+
+func GetAllDomainsFromCertificates() ([]string, error) {
+	certs, err := GetAllCertificates()
+	if err != nil {
+		return nil, err
+	}
+
+	domainMap := map[string]bool{}
+	domains := []string{}
+	for _, cert := range certs {
+		domainMap[strings.ToLower(cert.Subject())] = true
+		for _, alt := range strings.Split(cert.AlternativeNames(), ",") {
+			domainMap[strings.ToLower(alt)] = true
+		}
+	}
+
+	for domain := range domainMap {
+		domains = append(domains, domain)
+	}
+	return domains, nil
 }

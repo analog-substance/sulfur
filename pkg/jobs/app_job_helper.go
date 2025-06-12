@@ -8,10 +8,10 @@ import (
 
 func AddJobs() {
 	//slog.SetLogLoggerLevel(slog.LevelInfo)
-	AddJob("resolve domains", "*/1 * * * *", ResolveDomains)
-	//AddJob("Simple Port Scan", "*/1 * * * *", SimplePortScan)
+	AddJob("resolve domains", "*/1 * * * *", ResolveDNSRecordDomains)
 	AddJob("Simple Port Scan", "*/1 * * * *", SimplePortScanWorkers)
 	AddJob("Check Certs", "*/1 * * * *", CheckCerts)
+	AddJob("Get Domains From Certificates", "30 */1 * * *", ResolveCertificateDomains)
 
 }
 

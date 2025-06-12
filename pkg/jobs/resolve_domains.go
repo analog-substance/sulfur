@@ -1,10 +1,13 @@
 package jobs
 
 import (
+	"fmt"
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/projectdiscovery/dnsx/libs/dnsx"
 	"log"
+	"log/slog"
+	"strings"
 	"time"
 )
 
@@ -19,13 +22,34 @@ func init() {
 	}
 }
 
-func ResolveDomains() {
-	logger := app_state.GetApp().Logger().WithGroup("ResolveDomains")
+func ResolveCertificateDomains() {
+	logger := app_state.GetApp().Logger().WithGroup("ResolveCertificateDomains")
+	domainsToResolve, err := model.GetAllDomainsFromCertificates()
+	if err != nil {
+		logger.Error("failed to get domain queue: ", "err", err)
+		return
+	}
+
+	ResolveDomains(domainsToResolve, logger)
+}
+
+func ResolveDNSRecordDomains() {
+	logger := app_state.GetApp().Logger().WithGroup("ResolveDNSRecordDomains")
 	domainsToResolve, err := model.GetARecordsToResolve()
 	if err != nil {
 		logger.Error("failed to get domain queue: ", "err", err)
 		return
 	}
+
+	domains := []string{}
+	for _, domain := range domainsToResolve {
+		domains = append(domains, domain.Host)
+	}
+
+	ResolveDomains(domains, logger)
+}
+
+func ResolveDomains(domainsToResolve []string, logger *slog.Logger) {
 
 	total := len(domainsToResolve)
 	logger.Info("records to resolve", "total", total)
@@ -38,7 +62,7 @@ func ResolveDomains() {
 	}
 
 	for _, record := range domainsToResolve {
-		input <- record.Host
+		input <- record
 	}
 
 	result := make([]checkDNSStatus, total)
@@ -84,6 +108,13 @@ func CheckDNSWorker(input chan string, output chan checkDNSStatus) {
 }
 
 func getRecords(record string) ([]string, error) {
+
+	// check if it is a wildcard, if so change to random value
+	if strings.HasPrefix(record, "*.") {
+		record = strings.Replace(record, "*", fmt.Sprintf("rand-%s", time.Now().String()), 1)
+	}
+
+	app_state.GetApp().Logger().Debug("looking up dns record", "record", record)
 
 	result, err := dnsClient.Lookup(record)
 	if err != nil {
