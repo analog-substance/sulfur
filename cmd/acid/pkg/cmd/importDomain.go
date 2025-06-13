@@ -10,8 +10,8 @@ import (
 
 // importDomainCmd represents the add command
 var importDomainCmd = &cobra.Command{
-	Use:   "domain",
-	Short: "Resolve domains and import resultss",
+	Use:   "domains",
+	Short: "Resolve domains and import results",
 	Long: `For example:
 
 

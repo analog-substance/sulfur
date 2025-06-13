@@ -4,10 +4,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// orgCmd represents the add command
-var orgCmd = &cobra.Command{
-	Use:   "orgs",
-	Short: "org commands",
+// dnsCmd represents the add command
+var dnsCmd = &cobra.Command{
+	Use:   "dns",
+	Short: "dns commands",
 	Long: `todo
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -17,6 +17,6 @@ var orgCmd = &cobra.Command{
 
 func init() {
 
-	RootCmd.AddCommand(orgCmd)
+	RootCmd.AddCommand(dnsCmd)
 
 }
