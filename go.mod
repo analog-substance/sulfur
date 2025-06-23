@@ -6,12 +6,11 @@ require (
 	github.com/analog-substance/copper v0.0.0-20250612225544-c8c183fedcb8
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pocketbase/dbx v1.11.0
-	github.com/pocketbase/pocketbase v0.28.3
+	github.com/pocketbase/pocketbase v0.28.4
 	github.com/projectdiscovery/dnsx v1.2.2
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/net v0.41.0
-
 )
 
 exclude github.com/zmap/zcrypto v0.0.0-20250418211859-7510c141e4b7 // indirect
