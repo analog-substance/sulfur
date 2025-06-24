@@ -22,6 +22,7 @@ var importDNSCmd = &cobra.Command{
 		recordType, _ := cmd.Flags().GetString("type")
 		recordTTL, _ := cmd.Flags().GetInt("ttl")
 		importFile, _ := cmd.Flags().GetString("file")
+		batchSize, _ := cmd.Flags().GetInt("batch-size")
 
 		dnsRecords := []sulfur.DNSRecord{}
 
@@ -44,7 +45,14 @@ var importDNSCmd = &cobra.Command{
 		}
 
 		if len(dnsRecords) > 0 {
+
+			for len(dnsRecords) > batchSize {
+				batch := dnsRecords[:500]
+				dnsRecords = dnsRecords[500:]
+				sulfurAPIClient.ImportDNSRecords(batch)
+			}
 			sulfurAPIClient.ImportDNSRecords(dnsRecords)
+
 		}
 	},
 }
@@ -56,6 +64,7 @@ func init() {
 	importDNSCmd.Flags().StringP("value", "v", "", "value of record")
 	importDNSCmd.Flags().StringP("type", "t", "", "ttl of record")
 	importDNSCmd.Flags().IntP("ttl", "l", 0, "ttl of record")
+	importDNSCmd.Flags().IntP("batch-size", "s", 500, "batch size of import")
 	importDNSCmd.Flags().StringP("file", "f", "", "File to read records from")
 
 }
