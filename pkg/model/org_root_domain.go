@@ -1,13 +1,10 @@
 package model
 
 import (
-	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"golang.org/x/net/publicsuffix"
-	"strings"
 	"time"
 )
 
@@ -51,30 +48,6 @@ func (a *OrgRootDomain) SetRegistrar(registrar string) {
 
 func (a *OrgRootDomain) SetLastSeen(lastSeen time.Time) {
 	a.Set("last_seen", lastSeen)
-}
-
-func FindOrgRootDomain(rootDomainName string) (iface.OrgRootDomain, error) {
-
-	if strings.HasSuffix(rootDomainName, ".") {
-		rootDomainName = rootDomainName[:len(rootDomainName)-1]
-	}
-	rootDomain, err := publicsuffix.EffectiveTLDPlusOne(rootDomainName)
-
-	rdr := &OrgRootDomain{}
-
-	err = app_state.GetApp().RecordQuery(OrgRootDomainCollection).
-		AndWhere(dbx.NewExp("LOWER(domain)={:domain}", dbx.Params{
-			"domain": strings.ToLower(rootDomain),
-		})).
-		Limit(1).
-		One(rdr)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return rdr, nil
-
 }
 
 func OrgRootDomainFirstOrCreate(rootDomainID, orgID string) (iface.OrgRootDomain, error) {

@@ -15,6 +15,7 @@ var orgRootDomainsImportCmd = &cobra.Command{
 	Long: `todo
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		orgId := getRequiredOrgFlag(cmd)
 
 		domains := []string{}
 
@@ -40,7 +41,7 @@ var orgRootDomainsImportCmd = &cobra.Command{
 			})
 		}
 
-		err := sulfurAPIClient.ImportOrgRootDomains("74lrd90sf92argl", rootDomains)
+		err := sulfurAPIClient.ImportOrgRootDomains(orgId, rootDomains)
 		if err != nil {
 			log.Fatal(err)
 		}

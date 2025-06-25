@@ -15,6 +15,9 @@ type DNSRecord struct {
 	RootDomain        string `json:"root_domain"`
 	Created           string `json:"created"`
 	Updated           string `json:"updated"`
+	Expand            struct {
+		RootDomain RootDomain `json:"root_domain"`
+	} `json:"expand"`
 }
 
 type DNSRecordListResponse struct {

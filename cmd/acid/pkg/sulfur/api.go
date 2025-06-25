@@ -160,7 +160,7 @@ func (a *APIClient) Authenticate(authReq sulfur.AuthRequest) (*sulfur.AuthRespon
 func (a *APIClient) ListRootDomains() (*sulfur.RootDomainsListResponse, error) {
 	resStruct := sulfur.RootDomainsListResponse{}
 
-	err := a.GetStruct(sulfur.RootDomainSPath, &resStruct)
+	err := a.GetStruct(sulfur.RootDomainsPath, &resStruct)
 	if err != nil {
 		return nil, err
 	}
@@ -210,6 +210,62 @@ func (a *APIClient) ImportOrgRootDomains(orgId string, domainsToImport []sulfur.
 	}
 	defer resp.Body.Close()
 	return nil
+}
+
+func (a *APIClient) ImportOrgIPAddresses(orgId string, ipAddresses []string) error {
+	body, err := json.Marshal(ipAddresses)
+	if err != nil {
+		return err
+	}
+
+	apiPath := strings.Replace(sulfur.ImportOrgIPAddressesPath, "{org_id}", orgId, -1)
+
+	resp, err := a.PostJSON(apiPath, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (a *APIClient) ListOrgDomains(orgId string) (*sulfur.OrgDomainsListResponse, error) {
+	resStruct := sulfur.OrgDomainsListResponse{}
+
+	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
+	expand := "root_domain,organization"
+
+	err := a.GetStruct(fmt.Sprintf("%s?filter=%s&expand=%s", sulfur.OrgDomainsPath, filter, expand), &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resStruct, nil
+}
+
+func (a *APIClient) ListOrgIPAddresses(orgId string) (*sulfur.OrgIpAddressesListResponse, error) {
+	resStruct := sulfur.OrgIpAddressesListResponse{}
+
+	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
+	expand := "ip_address,organization"
+
+	err := a.GetStruct(fmt.Sprintf("%s?filter=%s&expand=%s", sulfur.OrgIPAddressesPath, filter, expand), &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resStruct, nil
+}
+
+func (a *APIClient) ListOrgSubDomainTakeovers(orgId string) ([]sulfur.SubdomainTakeover, error) {
+	resStruct := []sulfur.SubdomainTakeover{}
+	apiPath := strings.Replace(sulfur.ExportOrgSubdomainTakeovers, "{org_id}", orgId, -1)
+
+	err := a.GetStruct(apiPath, &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return resStruct, nil
 }
 
 func AddCIDR(org string, cidr *model.CIDR) {

@@ -60,7 +60,7 @@ func importOrgRootDomains(e *core.RequestEvent) error {
 
 		err = orgRootDomain.Save()
 		if err != nil {
-			log.Println("err saving root domain", err)
+			log.Println("err saving org root domain", err)
 		}
 	}
 	return e.String(http.StatusOK, "done")
