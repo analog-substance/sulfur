@@ -38,7 +38,7 @@ func importDNSRecords(e *core.RequestEvent) error {
 
 		err = dnsr.Save()
 		if err != nil {
-			log.Println("err saving dns record", err)
+			log.Println("err saving dns record", record.Name, record.Value, record.Type, err)
 		}
 	}
 	return e.String(http.StatusOK, "done")
