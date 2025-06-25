@@ -40,7 +40,10 @@ var orgRootDomainsImportCmd = &cobra.Command{
 			})
 		}
 
-		sulfurAPIClient.ImportOrgRootDomains("74lrd90sf92argl", rootDomains)
+		err := sulfurAPIClient.ImportOrgRootDomains("74lrd90sf92argl", rootDomains)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 	},
 }

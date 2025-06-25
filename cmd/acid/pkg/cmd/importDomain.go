@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bufio"
-	"github.com/analog-substance/sulfur/cmd/acid/pkg/dns"
+	"github.com/analog-substance/sulfur/pkg/dns"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -16,9 +16,10 @@ var importDomainCmd = &cobra.Command{
 
 
 	acid import domain test.google.com
-	as-crt-slurp.sh | acid import domain 
+	as-crt-slurp.sh | acid import domain -s
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		serverResolve, _ := cmd.Flags().GetBool("server-resolve")
 
 		domains := []string{}
 
@@ -37,15 +38,22 @@ var importDomainCmd = &cobra.Command{
 			}
 		}
 
-		resolvedDNS := dns.ResolveDomains(domains)
-
-		sulfurAPIClient.ImportDNSRecords(resolvedDNS)
-
+		if serverResolve {
+			err := sulfurAPIClient.ImportDomainAndResolve(domains)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			resolvedDNS := dns.ResolveDomains(domains)
+			err := sulfurAPIClient.ImportDNSRecords(resolvedDNS)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
 func init() {
-
 	importCmd.AddCommand(importDomainCmd)
-
+	importDomainCmd.Flags().BoolP("server-resolve", "s", false, "Send domains to server and resolve them there")
 }

@@ -168,36 +168,48 @@ func (a *APIClient) ListRootDomains() (*sulfur.RootDomainsListResponse, error) {
 	return &resStruct, nil
 }
 
-func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) {
+func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) error {
 	body, err := json.Marshal(domainsToImport)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	resp, err := a.PostJSON(sulfur.ImportDNSRecordsPath, body)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
+	return nil
 }
 
-func (a *APIClient) ImportOrgRootDomains(orgId string, domainsToImport []sulfur.OrgRootDomain) {
+func (a *APIClient) ImportDomainAndResolve(domainsToImport []string) error {
 	body, err := json.Marshal(domainsToImport)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
+	}
+
+	resp, err := a.PostJSON(sulfur.ImportDomainAndResolvePath, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (a *APIClient) ImportOrgRootDomains(orgId string, domainsToImport []sulfur.OrgRootDomain) error {
+	body, err := json.Marshal(domainsToImport)
+	if err != nil {
+		return err
 	}
 
 	apiPath := strings.Replace(sulfur.ImportOrgRootDomainsPath, "{org_id}", orgId, -1)
 
 	resp, err := a.PostJSON(apiPath, body)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
+	return nil
 }
 
 func AddCIDR(org string, cidr *model.CIDR) {

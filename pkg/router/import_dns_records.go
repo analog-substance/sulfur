@@ -23,6 +23,11 @@ func importDNSRecords(e *core.RequestEvent) error {
 		return e.String(http.StatusBadRequest, "invalid request body")
 	}
 
+	ImportDNSRecords(records)
+	return e.String(http.StatusOK, "done")
+}
+
+func ImportDNSRecords(records []sulfur.DNSRecord) {
 	for _, record := range records {
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
 		if err != nil {
@@ -41,5 +46,4 @@ func importDNSRecords(e *core.RequestEvent) error {
 			log.Println("err saving dns record", record.Name, record.Value, record.Type, err)
 		}
 	}
-	return e.String(http.StatusOK, "done")
 }

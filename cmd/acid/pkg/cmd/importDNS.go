@@ -49,9 +49,15 @@ var importDNSCmd = &cobra.Command{
 			for len(dnsRecords) > batchSize {
 				batch := dnsRecords[:500]
 				dnsRecords = dnsRecords[500:]
-				sulfurAPIClient.ImportDNSRecords(batch)
+				err := sulfurAPIClient.ImportDNSRecords(batch)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-			sulfurAPIClient.ImportDNSRecords(dnsRecords)
+			err := sulfurAPIClient.ImportDNSRecords(dnsRecords)
+			if err != nil {
+				log.Println(err)
+			}
 
 		}
 	},
