@@ -1,25 +1,33 @@
 package jobs
 
 import (
-	"fmt"
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
+	"github.com/miekg/dns"
 	"github.com/projectdiscovery/dnsx/libs/dnsx"
+	"github.com/projectdiscovery/retryabledns"
 	"log"
 	"log/slog"
-	"strings"
 	"time"
 )
 
-var dnsClient *dnsx.DNSX
+var dnsClient *retryabledns.Client
 
 func init() {
 	var err error
 	// Create DNS Resolver with default options
-	dnsClient, err = dnsx.New(dnsx.DefaultOptions)
+	retryablednsOptions := retryabledns.Options{
+		BaseResolvers: dnsx.DefaultOptions.BaseResolvers,
+		MaxRetries:    dnsx.DefaultOptions.MaxRetries,
+		Hostsfile:     dnsx.DefaultOptions.Hostsfile,
+		Proxy:         dnsx.DefaultOptions.Proxy,
+	}
+
+	dnsClient, err = retryabledns.NewWithOptions(retryablednsOptions)
 	if err != nil {
 		log.Panic("err: %v\n", err)
 	}
+	dnsClient.TCPFallback = true
 }
 
 func ResolveCertificateDomains() {
@@ -35,7 +43,7 @@ func ResolveCertificateDomains() {
 
 func ResolveDNSRecordDomains() {
 	logger := app_state.GetApp().Logger().WithGroup("ResolveDNSRecordDomains")
-	domainsToResolve, err := model.GetARecordsToResolve()
+	domainsToResolve, err := model.GetDNSLookupQueue()
 	if err != nil {
 		logger.Error("failed to get domain queue: ", "err", err)
 		return
@@ -71,58 +79,50 @@ func ResolveDomains(domainsToResolve []string, logger *slog.Logger) {
 		if result[i].Error != nil {
 			logger.Error("error in resolution results", "error", result[i].Error)
 		} else {
-			for _, v := range result[i].Value {
-				r, err := model.DNSRecordFirstOrCreate(result[i].Name, v, "A")
-				if err != nil {
-					logger.Error("error in dns record", "error", err, "name", result[i].Name, "value", v)
-					continue
-				}
 
-				r.SetLastResolved(time.Now())
-				r.SetResolveErr("")
-				if err := r.Save(); err != nil {
-					logger.Error("Failed to save DNS record", "name", result[i].Name, "error", err)
-				}
-			}
+			saveRecords("A", result[i].Name, result[i].DNSData.A, logger)
+			saveRecords("AAAA", result[i].Name, result[i].DNSData.AAAA, logger)
+			saveRecords("CNAME", result[i].Name, result[i].DNSData.CNAME, logger)
+			saveRecords("NS", result[i].Name, result[i].DNSData.NS, logger)
+			saveRecords("MX", result[i].Name, result[i].DNSData.MX, logger)
+			saveRecords("TXT", result[i].Name, result[i].DNSData.TXT, logger)
+			saveRecords("SRV", result[i].Name, result[i].DNSData.SRV, logger)
+
 		}
 	}
 }
 
 type checkDNSStatus struct {
-	Name  string
-	Value []string
-	Error error
+	Name    string
+	DNSData *retryabledns.DNSData
+	Error   error
 }
 
 func CheckDNSWorker(input chan string, output chan checkDNSStatus) {
 	for record := range input {
-
-		resolvable, err := getRecords(record)
-
+		dnsData, err := dnsClient.QueryMultiple(record, []uint16{dns.TypeA, dns.TypeAAAA, dns.TypeCNAME, dns.TypeTXT, dns.TypeNS, dns.TypeMX, dns.TypeSRV})
 		output <- checkDNSStatus{
-			Name:  record,
-			Value: resolvable,
-			Error: err,
+			Name:    record,
+			DNSData: dnsData,
+			Error:   err,
 		}
 	}
 }
 
-func getRecords(record string) ([]string, error) {
+func saveRecords(recordType string, name string, values []string, logger *slog.Logger) {
 
-	// check if it is a wildcard, if so change to random value
-	if strings.HasPrefix(record, "*.") {
-		record = strings.Replace(record, "*", fmt.Sprintf("rand-%s", time.Now().String()), 1)
-	}
-
-	app_state.GetApp().Logger().Debug("looking up dns record", "record", record)
-
-	result, err := dnsClient.Lookup(record)
-	if err != nil {
-		if err.Error() == "no ips found" {
-			return nil, nil
+	for _, v := range values {
+		r, err := model.DNSRecordFirstOrCreate(name, v, recordType)
+		if err != nil {
+			logger.Error("error in dns record", "error", err, "name", name, "value", v)
+			continue
 		}
-		return nil, err
+
+		r.SetLastResolved(time.Now())
+		r.SetResolveErr("")
+		if err := r.Save(); err != nil {
+			logger.Error("Failed to save DNS record", "name", name, "error", err)
+		}
 	}
 
-	return result, nil
 }

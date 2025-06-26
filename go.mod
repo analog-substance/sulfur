@@ -4,10 +4,12 @@ go 1.24.1
 
 require (
 	github.com/analog-substance/copper v0.0.0-20250612225544-c8c183fedcb8
+	github.com/miekg/dns v1.1.66
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.28.4
 	github.com/projectdiscovery/dnsx v1.2.2
+	github.com/projectdiscovery/retryabledns v1.0.102
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/net v0.41.0
@@ -38,14 +40,12 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
-	github.com/miekg/dns v1.1.66 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
 	github.com/projectdiscovery/cdncheck v1.1.24 // indirect
-	github.com/projectdiscovery/retryabledns v1.0.102 // indirect
 	github.com/projectdiscovery/utils v0.4.21 // indirect
 	github.com/prometheus-community/pro-bing v0.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect

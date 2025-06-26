@@ -207,18 +207,18 @@ type DNSScope struct {
 	Host string `db:"host" json:"host"`
 }
 
-const SQLARecordResolveQueue = `
+const SQLDNSLookupQueue = `
 SELECT dns_records.name host
 FROM dns_records
 WHERE dns_records.name NOT IN (
 	SELECT dns_records.name
 	FROM dns_records
-	WHERE type = 'A' AND (
+	WHERE (
 		(last_resolved > datetime('now', '-4 hours'))
 		OR (resolve_error != '')
 	)
 	GROUP BY dns_records.name
-) AND type = 'A' AND (
+) AND  (
 		(last_resolved IS NULL OR last_resolved < datetime('now', '-4 hours'))
 		OR (resolve_error IS NOT NULL OR resolve_error != '')
 	)
@@ -242,10 +242,10 @@ WHERE dns_records.value NOT IN (
 GROUP BY dns_records.value
 `
 
-func GetARecordsToResolve() ([]DNSScope, error) {
+func GetDNSLookupQueue() ([]DNSScope, error) {
 	accounts := []DNSScope{}
 	err := app_state.GetApp().DB().
-		NewQuery(SQLARecordResolveQueue).
+		NewQuery(SQLDNSLookupQueue).
 		All(&accounts)
 
 	return accounts, err
