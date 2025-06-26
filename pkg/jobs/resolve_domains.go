@@ -79,7 +79,6 @@ func ResolveDomains(domainsToResolve []string, logger *slog.Logger) {
 		if result[i].Error != nil {
 			logger.Error("error in resolution results", "error", result[i].Error)
 		} else {
-
 			saveRecords("A", result[i].Name, result[i].DNSData.A, logger)
 			saveRecords("AAAA", result[i].Name, result[i].DNSData.AAAA, logger)
 			saveRecords("CNAME", result[i].Name, result[i].DNSData.CNAME, logger)
@@ -87,7 +86,6 @@ func ResolveDomains(domainsToResolve []string, logger *slog.Logger) {
 			saveRecords("MX", result[i].Name, result[i].DNSData.MX, logger)
 			saveRecords("TXT", result[i].Name, result[i].DNSData.TXT, logger)
 			saveRecords("SRV", result[i].Name, result[i].DNSData.SRV, logger)
-
 		}
 	}
 }
@@ -110,7 +108,6 @@ func CheckDNSWorker(input chan string, output chan checkDNSStatus) {
 }
 
 func saveRecords(recordType string, name string, values []string, logger *slog.Logger) {
-
 	for _, v := range values {
 		r, err := model.DNSRecordFirstOrCreate(name, v, recordType)
 		if err != nil {
@@ -124,5 +121,4 @@ func saveRecords(recordType string, name string, values []string, logger *slog.L
 			logger.Error("Failed to save DNS record", "name", name, "error", err)
 		}
 	}
-
 }
