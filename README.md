@@ -286,5 +286,3 @@ classDiagram
         +DateTime Updated
     }
 ```
-
-
