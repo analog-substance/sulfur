@@ -118,8 +118,9 @@ func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.D
 	//	}
 	//}
 
+	recordValue = strings.TrimSpace(recordValue)
 	recordName = strings.TrimSpace(recordName)
-	recordValue = strings.TrimRight(recordValue, ".")
+	recordName = strings.TrimRight(recordName, ".")
 	record, err := FirstOrCreateByFilter(
 		DNSRecordCollection,
 		//"name={:name} && value={:value} && type={:type}",
