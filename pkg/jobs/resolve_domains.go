@@ -98,7 +98,7 @@ type checkDNSStatus struct {
 
 func CheckDNSWorker(input chan string, output chan checkDNSStatus) {
 	for record := range input {
-		dnsData, err := dnsClient.QueryMultiple(record, []uint16{dns.TypeA, dns.TypeAAAA, dns.TypeCNAME, dns.TypeTXT, dns.TypeNS, dns.TypeMX, dns.TypeSRV})
+		dnsData, err := DNSQueryMultiple(record, []uint16{dns.TypeA, dns.TypeAAAA, dns.TypeCNAME, dns.TypeTXT, dns.TypeNS, dns.TypeMX, dns.TypeSRV})
 		output <- checkDNSStatus{
 			Name:    record,
 			DNSData: dnsData,
@@ -121,4 +121,8 @@ func saveRecords(recordType string, name string, values []string, logger *slog.L
 			logger.Error("Failed to save DNS record", "name", name, "error", err)
 		}
 	}
+}
+
+func DNSQueryMultiple(record string, types []uint16) (*retryabledns.DNSData, error) {
+	return dnsClient.QueryMultiple(record, types)
 }
