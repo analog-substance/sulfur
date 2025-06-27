@@ -19,7 +19,7 @@ var orgListCmd = &cobra.Command{
 		}
 
 		for _, org := range orgsListResponse.Items {
-			fmt.Println(org.Name)
+			fmt.Println(org.Name, org.Id)
 		}
 	},
 }

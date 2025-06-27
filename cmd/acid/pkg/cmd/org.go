@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 )
 
@@ -12,23 +13,19 @@ var orgCmd = &cobra.Command{
 	Short:   "org commands",
 	Long: `todo
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//
+	//},
 }
 
 func init() {
-
-	orgCmd.PersistentFlags().StringP("org-id", "o", "", "ID of the organization")
-
 	RootCmd.AddCommand(orgCmd)
-
 }
 
 func getRequiredOrgFlag(cmd *cobra.Command) string {
-	orgId, _ := cmd.Flags().GetString("org-id")
+	orgId := viper.GetString("organization")
 	if orgId == "" {
-		log.Panic("must specify --org-id")
+		log.Panic("must specify an organization in config or with --org")
 	}
 
 	return orgId

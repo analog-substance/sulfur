@@ -19,14 +19,13 @@ var RootCmd = &cobra.Command{
 	Short: "get data into Sulfur",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-
 		sulfurAPIClient = sulfur.New(viper.GetString("api-endpoint"), viper.GetString("api-user"), viper.GetString("api-pass"))
 	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//
+	//},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
