@@ -51,7 +51,6 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 					}
 				} else {
 					logger.Error("failed to lookup missing dns record", "record", record, "dnsData", dnsData)
-
 				}
 			}
 		}
@@ -61,8 +60,10 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 
 	for _, record := range records {
 		if record.Value == "" {
-			logger.Error("skipping DNS record without a value", "name", record.Name, "type", record.Type)
+			logger.Error("skipping DNS record without a value", "record", record)
+			continue
 		}
+
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
 		if err != nil {
 			logger.Error("unable to find or create dns record", "err", err)
@@ -77,7 +78,7 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 
 		err = dnsr.Save()
 		if err != nil {
-			logger.Error("err saving dns record", "recordName", record.Name, "recordVal", record.Value, "recordType", record.Type, "err", err)
+			logger.Error("err saving dns record", "record", "err", err)
 		}
 	}
 	logger.Info("import dns complete", "count", len(records))
