@@ -44,18 +44,30 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 				if err != nil {
 					logger.Error("failed to lookup missing dns record", "name", record.Name, "type", record.Type, "err", err)
 				}
-				if len(dnsData.A) > 0 {
-					record.Value = dnsData.A[0]
-					if len(dnsData.A) > 1 {
-						extra = append(extra, sulfur.DNSRecord{Name: record.Name, Value: record.Value, Type: record.Type, TTL: int(dnsData.TTL)})
+
+				recordCount := len(dnsData.A)
+				logger.Info("missing dns record lookup", "record", record, "recordCount", recordCount)
+				for i, aRecord := range dnsData.A {
+					logger.Debug("processing JIT dns record", "aRecord", aRecord, "record", record)
+
+					if i == 0 {
+						record.Value = aRecord
+					} else {
+						extra = append(extra, sulfur.DNSRecord{Name: record.Name, Value: aRecord, Type: record.Type, TTL: int(dnsData.TTL)})
 					}
-				} else {
-					logger.Error("failed to lookup missing dns record", "record", record, "dnsData", dnsData)
+				}
+				if recordCount > 0 {
+
+				}
+				if len(dnsData.A) > 1 {
+					for i := 1; i < recordCount; i++ {
+					}
 				}
 			}
 		}
 	}
 
+	logger.Info("appending extra records from JIT resolution", "count", len(extra))
 	records = append(records, extra...)
 
 	for _, record := range records {
