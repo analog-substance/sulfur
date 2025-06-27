@@ -46,7 +46,7 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 				}
 
 				recordCount := len(dnsData.A)
-				logger.Info("missing dns record lookup", "record", record, "recordCount", recordCount)
+				logger.Info("missing dns record lookup", "record", record, "recordCount", recordCount, "dnsData", dnsData)
 				for i, aRecord := range dnsData.A {
 					logger.Debug("processing JIT dns record", "aRecord", aRecord, "record", record)
 
