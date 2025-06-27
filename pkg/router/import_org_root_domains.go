@@ -2,6 +2,8 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/analog-substance/sulfur/pkg/app_state"
+	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/pocketbase/pocketbase/core"
@@ -31,11 +33,17 @@ func importOrgRootDomains(e *core.RequestEvent) error {
 		return e.String(http.StatusBadRequest, "invalid request body")
 	}
 
-	for _, domain := range domains {
+	go importOrgDomains(domains, org)
+	return e.String(http.StatusOK, "done")
+}
 
+func importOrgDomains(domains []sulfur.OrgRootDomain, org iface.Organization) {
+	logger := app_state.GetApp().Logger().WithGroup("importOrgDomains")
+
+	for _, domain := range domains {
 		rootDomain, err := model.RootDomainFirstOrCreate(domain.Domain)
 		if err != nil {
-			log.Println("cant find root domain", err)
+			logger.Error("unable to find root domain", "err", err)
 			continue
 		}
 
@@ -44,14 +52,14 @@ func importOrgRootDomains(e *core.RequestEvent) error {
 		if rootDomain.Id() == "" {
 			err = rootDomain.Save()
 			if err != nil {
-				log.Println("unable to save root domain", err)
+				logger.Error("unable to save root domain", "err", err)
 				continue
 			}
 		}
 
 		orgRootDomain, err := model.OrgRootDomainFirstOrCreate(rootDomain.Id(), org.Id())
 		if err != nil {
-			log.Println("unable to find or create root domain", rootDomain.Id(), org.Id(), err)
+			logger.Error("unable to find or create root domain", "rootDomainId", rootDomain.Id(), "orgId", org.Id(), "err", err)
 			continue
 		}
 
@@ -60,8 +68,8 @@ func importOrgRootDomains(e *core.RequestEvent) error {
 
 		err = orgRootDomain.Save()
 		if err != nil {
-			log.Println("err saving org root domain", err)
+			logger.Error("error saving org root domain", "err", err)
 		}
 	}
-	return e.String(http.StatusOK, "done")
+	logger.Info("Imported org root domains", "count", len(domains))
 }

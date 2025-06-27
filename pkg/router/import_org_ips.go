@@ -2,10 +2,11 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/analog-substance/sulfur/pkg/app_state"
+	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/pocketbase/pocketbase/core"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -30,29 +31,31 @@ func importOrgIPAddresses(e *core.RequestEvent) error {
 		return e.String(http.StatusBadRequest, "invalid request body")
 	}
 
+	go importOrgIPs(ipAddresses, org)
+	return e.String(http.StatusOK, "done")
+}
+
+func importOrgIPs(ipAddresses []string, org iface.Organization) {
+	logger := app_state.GetApp().Logger().WithGroup("importOrgIPAddresses")
+
 	for _, ipAddress := range ipAddresses {
-
-		log.Println(ipAddress)
-
 		ipAddr, err := model.IPAddressFirstOrCreate(ipAddress)
 		if err != nil {
-			log.Println("cant find ip address", err)
+			logger.Error("cant find ip address", "err", err)
 			continue
 		}
-
-		log.Println("Found ip address", ipAddr.Address())
 
 		if ipAddr.Id() == "" {
 			err = ipAddr.Save()
 			if err != nil {
-				log.Println("unable to save ip address", err)
+				logger.Error("cant save ip address", "err", err)
 				continue
 			}
 		}
 
 		orgIPAddr, err := model.OrgIPAddressFirstOrCreate(ipAddr.Id(), org.Id())
 		if err != nil {
-			log.Println("unable to find or create org ip addr", ipAddr.Id(), org.Id(), err)
+			logger.Error("unable to find or create org ip addr", "ipAddrId", ipAddr.Id(), "orgId", org.Id(), "err", err)
 			continue
 		}
 
@@ -60,8 +63,9 @@ func importOrgIPAddresses(e *core.RequestEvent) error {
 
 		err = orgIPAddr.Save()
 		if err != nil {
-			log.Println("err saving org ip addr", err)
+			logger.Error("err saving org ip addr", "err", err)
 		}
 	}
-	return e.String(http.StatusOK, "done")
+
+	logger.Info("import org ip addresses complete", "count", len(ipAddresses))
 }

@@ -2,11 +2,11 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/pocketbase/pocketbase/core"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -23,15 +23,17 @@ func importDNSRecords(e *core.RequestEvent) error {
 		return e.String(http.StatusBadRequest, "invalid request body")
 	}
 
-	ImportDNSRecords(records)
+	go ImportDNSRecords(records)
 	return e.String(http.StatusOK, "done")
 }
 
 func ImportDNSRecords(records []sulfur.DNSRecord) {
+	logger := app_state.GetApp().Logger().WithGroup("importDNSRecords")
+
 	for _, record := range records {
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)
 		if err != nil {
-			log.Println("unable to find or create dns record", err)
+			logger.Error("unable to find or create dns record", "err", err)
 			continue
 		}
 
@@ -43,7 +45,9 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 
 		err = dnsr.Save()
 		if err != nil {
-			log.Println("err saving dns record", record.Name, record.Value, record.Type, err)
+			logger.Error("err saving dns record", "recordName", record.Name, "recordVal", record.Value, "recordType", record.Type, "err", err)
 		}
 	}
+	logger.Info("import dns complete", "count", len(records))
+
 }
