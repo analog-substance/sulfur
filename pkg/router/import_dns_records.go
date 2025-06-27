@@ -44,9 +44,11 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 				if err != nil {
 					logger.Error("failed to lookup missing dns record", "name", record.Name, "type", record.Type, "err", err)
 				}
-				record.Value = dnsData.A[0]
-				if len(record.Value) > 1 {
-					extra = append(extra, sulfur.DNSRecord{Name: record.Name, Value: record.Value, Type: record.Type, TTL: int(dnsData.TTL)})
+				if len(record.Value) > 0 {
+					record.Value = dnsData.A[0]
+					if len(record.Value) > 1 {
+						extra = append(extra, sulfur.DNSRecord{Name: record.Name, Value: record.Value, Type: record.Type, TTL: int(dnsData.TTL)})
+					}
 				}
 			}
 		}
