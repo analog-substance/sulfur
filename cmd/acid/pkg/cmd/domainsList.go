@@ -26,8 +26,8 @@ var domainsListCmd = &cobra.Command{
 			}
 			fmt.Println(string(outBytes))
 		} else {
-			for _, org := range listResponse.Items {
-				fmt.Println(org.Type, org.Name, org.Value)
+			for _, domain := range listResponse.Items {
+				fmt.Println(domain.Domain)
 			}
 		}
 	},
@@ -35,7 +35,7 @@ var domainsListCmd = &cobra.Command{
 
 func init() {
 
-	dnsCmd.AddCommand(dnsListCmd)
+	domainsCmd.AddCommand(domainsListCmd)
 	dnsListCmd.Flags()
 
 }

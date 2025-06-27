@@ -21,6 +21,6 @@ var importNmapCmd = &cobra.Command{
 
 func init() {
 
-	importCmd.AddCommand(importNmapCmd)
+	RootCmd.AddCommand(importNmapCmd)
 
 }
