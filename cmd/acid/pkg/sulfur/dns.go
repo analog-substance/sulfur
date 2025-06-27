@@ -1,11 +1,16 @@
 package sulfur
 
-import "github.com/analog-substance/sulfur/pkg/sulfur"
+import (
+	"fmt"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
+)
 
 func (a *APIClient) ListDNSRecords() (*sulfur.DNSRecordListResponse, error) {
 	resStruct := sulfur.DNSRecordListResponse{}
 
-	err := a.GetStruct(sulfur.DNSRecordsPath, &resStruct)
+	apiPath := fmt.Sprintf("%s?perPage=10000", sulfur.DNSRecordsPath)
+
+	err := a.GetStruct(apiPath, &resStruct)
 	if err != nil {
 		return nil, err
 	}

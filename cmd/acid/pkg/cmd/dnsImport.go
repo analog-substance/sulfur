@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/spf13/cobra"
 	"log"
@@ -10,7 +11,7 @@ import (
 
 // importDNSCmd represents the add command
 var importDNSCmd = &cobra.Command{
-	Use:   "dns",
+	Use:   "import",
 	Short: "import DNS records",
 	Long: `For example:
 
@@ -44,16 +45,25 @@ var importDNSCmd = &cobra.Command{
 			}
 		}
 
-		if len(dnsRecords) > 0 {
+		dnsRecordLen := len(dnsRecords)
+		if dnsRecordLen > 0 {
+
+			batches := dnsRecordLen / batchSize
+
+			fmt.Printf("Importing %d DNS records in %d batches\n", dnsRecordLen, batches)
 
 			for len(dnsRecords) > batchSize {
-				batch := dnsRecords[:500]
-				dnsRecords = dnsRecords[500:]
+				fmt.Printf("Sending batch %d\n", batches-(len(dnsRecords)/batchSize))
+				batch := dnsRecords[:batchSize]
+				dnsRecords = dnsRecords[batchSize:]
+
 				err := sulfurAPIClient.ImportDNSRecords(batch)
 				if err != nil {
-					log.Println(err)
+					log.Println("error importing dns records", err)
 				}
 			}
+
+			fmt.Printf("Sending batch %d\n", batches-(len(dnsRecords)/batchSize))
 			err := sulfurAPIClient.ImportDNSRecords(dnsRecords)
 			if err != nil {
 				log.Println(err)
@@ -65,7 +75,7 @@ var importDNSCmd = &cobra.Command{
 
 func init() {
 
-	importCmd.AddCommand(importDNSCmd)
+	dnsCmd.AddCommand(importDNSCmd)
 	importDNSCmd.Flags().StringP("name", "n", "", "name of record")
 	importDNSCmd.Flags().StringP("value", "v", "", "value of record")
 	importDNSCmd.Flags().StringP("type", "t", "", "ttl of record")

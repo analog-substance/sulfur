@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// importCmd represents the add command
-var importCmd = &cobra.Command{
-	Use:   "import",
+// domainsCmd represents the add command
+var domainsCmd = &cobra.Command{
+	Use:   "domains",
 	Short: "import data from external jobs",
 	Long: `
 
@@ -18,6 +18,6 @@ var importCmd = &cobra.Command{
 
 func init() {
 
-	RootCmd.AddCommand(importCmd)
+	RootCmd.AddCommand(domainsCmd)
 
 }

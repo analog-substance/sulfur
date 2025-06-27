@@ -8,10 +8,11 @@ import (
 var dnsCmd = &cobra.Command{
 	Use:   "dns",
 	Short: "dns commands",
+
 	Long: `todo
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		dnsListCmd.Run(cmd, args)
 	},
 }
 

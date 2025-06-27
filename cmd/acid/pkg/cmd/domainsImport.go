@@ -10,10 +10,10 @@ import (
 
 // importDomainCmd represents the add command
 var importDomainCmd = &cobra.Command{
-	Use:   "domains",
-	Short: "Resolve domains and import results",
+	Use:     "domains",
+	Aliases: []string{"domain"},
+	Short:   "Resolve domains and import results",
 	Long: `For example:
-
 
 	acid import domain test.google.com
 	as-crt-slurp.sh | acid import domain -s
@@ -54,6 +54,6 @@ var importDomainCmd = &cobra.Command{
 }
 
 func init() {
-	importCmd.AddCommand(importDomainCmd)
+	domainsCmd.AddCommand(importDomainCmd)
 	importDomainCmd.Flags().BoolP("server-resolve", "s", false, "Send domains to server and resolve them there")
 }

@@ -11,6 +11,7 @@ import (
 
 var cfgFile string
 var sulfurAPIClient *sulfur.APIClient
+var jsonOutput = false
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -51,6 +52,7 @@ func init() {
 	RootCmd.PersistentFlags().String("url", "http://127.0.0.1:8090", "URL to use as api endpoint")
 	RootCmd.PersistentFlags().String("api-user", "", "Username to use for api")
 	RootCmd.PersistentFlags().String("api-pass", "", "Password to use for api")
+	RootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", jsonOutput, "Output as JSON")
 	//RootCmd.PersistentFlags().StringP("scope", "s", scopious.DefaultScope, "Scope name")
 
 	//rootCmd.PersistentFlags().String("domains-file", "scope-domains.txt", "where in-scope domains are located.")
