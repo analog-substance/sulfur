@@ -29,6 +29,7 @@ func importDNSRecords(e *core.RequestEvent) error {
 
 func ImportDNSRecords(records []sulfur.DNSRecord) {
 	logger := app_state.GetApp().Logger().WithGroup("importDNSRecords")
+	logger.Info("import dns started", "count", len(records))
 
 	for _, record := range records {
 		dnsr, err := model.DNSRecordFirstOrCreate(record.Name, record.Value, record.Type)

@@ -39,6 +39,7 @@ func importOrgRootDomains(e *core.RequestEvent) error {
 
 func importOrgDomains(domains []sulfur.OrgRootDomain, org iface.Organization) {
 	logger := app_state.GetApp().Logger().WithGroup("importOrgDomains")
+	logger.Info("Imported org root started", "count", len(domains))
 
 	for _, domain := range domains {
 		rootDomain, err := model.RootDomainFirstOrCreate(domain.Domain)

@@ -37,7 +37,7 @@ func importOrgIPAddresses(e *core.RequestEvent) error {
 
 func importOrgIPs(ipAddresses []string, org iface.Organization) {
 	logger := app_state.GetApp().Logger().WithGroup("importOrgIPAddresses")
-
+	logger.Info("import org ip addresses started", "count", len(ipAddresses))
 	for _, ipAddress := range ipAddresses {
 		ipAddr, err := model.IPAddressFirstOrCreate(ipAddress)
 		if err != nil {
