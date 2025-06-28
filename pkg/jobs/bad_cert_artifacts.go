@@ -54,6 +54,7 @@ func Screenshot(host, ip string) ([]byte, error) {
 	allocatorCtx, allocatorCancel := chromedp.NewExecAllocator(
 		context.Background(),
 		chromedp.Flag("host-resolver-rules", fmt.Sprintf("MAP %s %s", host, ip)),
+		chromedp.Flag("ignore-certificate-errors", "1"),
 		chromedp.Flag("headless", true),
 	)
 	defer allocatorCancel()
