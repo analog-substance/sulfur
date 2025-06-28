@@ -34,7 +34,7 @@ func BadCertArtifacts() {
 
 		artifact, err := model.ArtifactFirstOrCreate(record.Id(), "")
 		if err != nil {
-			logger.Error("Error createing artifact obj", "error", err)
+			logger.Error("Error creating artifact obj", "error", err)
 
 			continue
 		}
