@@ -7,6 +7,7 @@ import (
 	"github.com/analog-substance/sulfur/pkg/model"
 	"github.com/chromedp/chromedp"
 	"github.com/pocketbase/pocketbase/tools/filesystem"
+	"log/slog"
 	"time"
 )
 
@@ -26,7 +27,7 @@ func BadCertArtifacts() {
 	logger.Info("processing results", "count", total)
 
 	for _, record := range dnsRecords {
-		screenshot, err := Screenshot(record.Name(), record.Value())
+		screenshot, err := Screenshot(record.Name(), record.Value(), logger)
 		if err != nil {
 			logger.Error("Error getting screenshot", "record", record, "error", err)
 			continue
@@ -35,7 +36,6 @@ func BadCertArtifacts() {
 		artifact, err := model.ArtifactFirstOrCreate(record.Id(), "")
 		if err != nil {
 			logger.Error("Error creating artifact obj", "record", record, "error", err)
-
 			continue
 		}
 
@@ -49,7 +49,7 @@ func BadCertArtifacts() {
 	}
 }
 
-func Screenshot(host, ip string) ([]byte, error) {
+func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 	// create context
 	allocatorCtx, allocatorCancel := chromedp.NewExecAllocator(
 		context.Background(),
@@ -61,13 +61,21 @@ func Screenshot(host, ip string) ([]byte, error) {
 
 	ctx, cancel := chromedp.NewContext(
 		allocatorCtx,
+		chromedp.IgnoreCertErrors,
+		chromedp.Ign,
+
 		//chromedp.WithDebugf(debug.Printf),
 	)
 	defer cancel()
 
 	var buf []byte
 	// capture entire browser viewport, returning png with quality=90
-	err := chromedp.Run(ctx, fullScreenshot(fmt.Sprintf("https://%s", host), 90, &buf))
+	err := chromedp.Run(ctx, chromedp.Navigate(fmt.Sprintf("https://%s", host)))
+	if err != nil {
+		logger.Error("Ignoring navigation error", "error", err)
+	}
+
+	err = chromedp.Run(ctx, fullScreenshot(fmt.Sprintf("https://%s", host), 90, &buf))
 	return buf, err
 }
 
@@ -77,7 +85,6 @@ func Screenshot(host, ip string) ([]byte, error) {
 // device.Reset to reset the emulation and viewport settings.
 func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(urlstr),
 		chromedp.Sleep(2 * time.Second),
 		chromedp.FullScreenshot(res, quality),
 	}
