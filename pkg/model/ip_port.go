@@ -142,12 +142,12 @@ LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id
 WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443  AND ip_ports.last_seen > datetime('now', '-8 hours')
 `
 
-type ipPortRecords struct {
+type dbId struct {
 	Id string `db:"id"`
 }
 
 func GetCertsQueue() ([]iface.IPPort, error) {
-	ipPorts := []ipPortRecords{}
+	ipPorts := []dbId{}
 	err := app_state.GetApp().DB().
 		NewQuery(SQLCertQueue).
 		All(&ipPorts)

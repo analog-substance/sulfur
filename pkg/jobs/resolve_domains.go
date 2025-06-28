@@ -77,7 +77,7 @@ func ResolveDomains(domainsToResolve []string, logger *slog.Logger) {
 	for i, _ := range result {
 		result[i] = <-output
 		if result[i].Error != nil {
-			logger.Error("error in resolution results", "error", result[i].Error)
+			logger.Error("error in resolution results", "error", result[i].Error, "dnsData", result[i].DNSData)
 		} else {
 			saveRecords("A", result[i].Name, result[i].DNSData.A, logger)
 			saveRecords("AAAA", result[i].Name, result[i].DNSData.AAAA, logger)

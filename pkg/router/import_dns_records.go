@@ -42,11 +42,12 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 			if record.Type == "A" {
 				dnsData, err := jobs.DNSQueryMultiple(record.Name, []uint16{dns.TypeA})
 				if err != nil {
-					logger.Error("failed to lookup missing dns record", "name", record.Name, "type", record.Type, "err", err)
+					logger.Error("JIT DNS lookup failed", "record", record, "err", err)
+					continue
 				}
 
 				recordCount := len(dnsData.A)
-				logger.Info("missing dns record lookup", "record", record, "recordCount", recordCount, "dnsData", dnsData)
+				logger.Info("JIT DNS lookup completed", "record", record, "recordCount", recordCount, "dnsData", dnsData)
 				for i, aRecord := range dnsData.A {
 					logger.Debug("processing JIT dns record", "aRecord", aRecord, "record", record)
 
@@ -54,13 +55,6 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 						record.Value = aRecord
 					} else {
 						extra = append(extra, sulfur.DNSRecord{Name: record.Name, Value: aRecord, Type: record.Type, TTL: int(dnsData.TTL)})
-					}
-				}
-				if recordCount > 0 {
-
-				}
-				if len(dnsData.A) > 1 {
-					for i := 1; i < recordCount; i++ {
 					}
 				}
 			}
