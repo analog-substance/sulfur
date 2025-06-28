@@ -61,9 +61,6 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 
 	ctx, cancel := chromedp.NewContext(
 		allocatorCtx,
-		chromedp.IgnoreCertErrors,
-		chromedp.Ign,
-
 		//chromedp.WithDebugf(debug.Printf),
 	)
 	defer cancel()
