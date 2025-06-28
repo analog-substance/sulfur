@@ -28,13 +28,13 @@ func BadCertArtifacts() {
 	for _, record := range dnsRecords {
 		screenshot, err := Screenshot(record.Name(), record.Value())
 		if err != nil {
-			logger.Error("Error getting screenshot", "error", err)
+			logger.Error("Error getting screenshot", "record", record, "error", err)
 			continue
 		}
 
 		artifact, err := model.ArtifactFirstOrCreate(record.Id(), "")
 		if err != nil {
-			logger.Error("Error creating artifact obj", "error", err)
+			logger.Error("Error creating artifact obj", "record", record, "error", err)
 
 			continue
 		}
@@ -44,7 +44,7 @@ func BadCertArtifacts() {
 
 		err = artifact.Save()
 		if err != nil {
-			logger.Error("Error saving artifact obj", "error", err)
+			logger.Error("Error saving artifact obj", "record", record, "error", err)
 		}
 	}
 }
