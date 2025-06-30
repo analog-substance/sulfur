@@ -10,9 +10,8 @@ import (
 
 // importDomainCmd represents the add command
 var importDomainCmd = &cobra.Command{
-	Use:     "domains",
-	Aliases: []string{"domain"},
-	Short:   "Resolve domains and import results",
+	Use:   "import",
+	Short: "Resolve domains and import results",
 	Long: `For example:
 
 	acid import domain test.google.com
