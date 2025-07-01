@@ -11,6 +11,7 @@ type DNSRecord interface {
 	SetType(string)
 	SetTTL(time.Duration)
 	SetRootDomain(domain RootDomain)
+	SetExternalReference(domain ExternalReference)
 
 	SetResolveErr(resolveErr string)
 	SetResolveErrCount(errCount int)

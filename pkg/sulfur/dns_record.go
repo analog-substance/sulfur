@@ -13,6 +13,7 @@ type DNSRecord struct {
 	LastResolved      string `json:"last_resolved"`
 	LastSeen          string `json:"last_seen"`
 	RootDomain        string `json:"root_domain"`
+	ExternalReference string `json:"external_reference"`
 	Created           string `json:"created"`
 	Updated           string `json:"updated"`
 	Expand            struct {

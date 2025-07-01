@@ -21,6 +21,7 @@ var importDNSCmd = &cobra.Command{
 		recordName, _ := cmd.Flags().GetString("name")
 		recordValue, _ := cmd.Flags().GetString("value")
 		recordType, _ := cmd.Flags().GetString("type")
+		externalRef, _ := cmd.Flags().GetString("external-ref")
 		recordTTL, _ := cmd.Flags().GetInt("ttl")
 		importFile, _ := cmd.Flags().GetString("file")
 		batchSize, _ := cmd.Flags().GetInt("batch-size")
@@ -29,10 +30,11 @@ var importDNSCmd = &cobra.Command{
 
 		if recordName != "" && recordValue != "" && recordType != "" && recordTTL > 0 {
 			dnsRecords = append(dnsRecords, sulfur.DNSRecord{
-				Name:  recordName,
-				Value: recordValue,
-				Type:  recordType,
-				TTL:   recordTTL,
+				Name:              recordName,
+				Value:             recordValue,
+				Type:              recordType,
+				TTL:               recordTTL,
+				ExternalReference: externalRef,
 			})
 		} else if importFile != "" {
 			b, err := os.ReadFile(importFile)
@@ -79,6 +81,7 @@ func init() {
 	importDNSCmd.Flags().StringP("name", "n", "", "name of record")
 	importDNSCmd.Flags().StringP("value", "v", "", "value of record")
 	importDNSCmd.Flags().StringP("type", "t", "", "ttl of record")
+	importDNSCmd.Flags().StringP("external-ref", "r", "", "external reference id")
 	importDNSCmd.Flags().IntP("ttl", "l", 0, "ttl of record")
 	importDNSCmd.Flags().IntP("batch-size", "s", 500, "batch size of import")
 	importDNSCmd.Flags().StringP("file", "f", "", "File to read records from")

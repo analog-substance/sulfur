@@ -84,6 +84,9 @@ func (a *DNSRecord) SetRootDomain(domain iface.RootDomain) {
 	a.Set("root_domain", domain.Id())
 }
 
+func (a *DNSRecord) SetExternalReference(domain iface.ExternalReference) {
+	a.Set("external_reference", domain.Id())
+}
 func (a *DNSRecord) SetResolveErr(resolveErr string) {
 	a.Set("resolve_error", resolveErr)
 }
