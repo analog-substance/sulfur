@@ -17,8 +17,10 @@ func main() {
 	app := pocketbase.New()
 	pb_util.InitApp(app)
 
+	forceMigrate := os.Getenv("FORCE_AUTOMIGRATE")
+
 	// loosely check if it was executed using "go run"
-	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
+	isGoRun := forceMigrate == "1" || strings.HasPrefix(os.Args[0], os.TempDir())
 
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
 		// enable auto creation of migration files when making collection changes in the Dashboard
