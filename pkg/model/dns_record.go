@@ -226,6 +226,7 @@ WHERE dns_records.name NOT IN (
 		OR (resolve_error IS NOT NULL OR resolve_error != '')
 	)
 GROUP BY dns_records.name
+LIMIT 1000
 `
 
 const SQLAddrResolveQueue = `
@@ -270,6 +271,7 @@ LEFT JOIN ip_ports ON ip_addresses.id=ip_ports.ip_address
 WHERE ip_addresses.is_private = false AND ip_addresses.is_shared = false AND ip_addresses.is_loopback = false
   AND (ip_addresses.last_simple_port_scan IS NULL OR ip_addresses.last_simple_port_scan < datetime('now', '-4 hours'))
 GROUP BY ip_addresses.address
+LIMIT 1000
 `
 
 func GetSimplePortScanInput() ([]DNSScope, error) {

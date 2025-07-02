@@ -11,7 +11,7 @@ func AddJobs() {
 	AddJob("resolve domains", "*/1 * * * *", ResolveDNSRecordDomains)
 	AddJob("Simple Port Scan", "*/1 * * * *", SimplePortScanWorkers)
 	AddJob("Check Certs", "*/1 * * * *", CheckCerts)
-	AddJob("Get Domains From Certificates", "30 */1 * * *", ResolveCertificateDomains)
+	AddJob("Get Domains From Certificates", "10 1 * * *", ResolveCertificateDomains)
 	AddJob("Capture Bad Cert Screenshots", "*/5 * * * *", BadCertArtifacts)
 
 }
