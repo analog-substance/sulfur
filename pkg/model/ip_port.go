@@ -139,7 +139,9 @@ SELECT ip_ports.*
 FROM ip_ports
 INNER JOIN ip_addresses on ip_addresses.id = ip_ports.ip_address
 LEFT JOIN ip_port_certificates on ip_port_certificates.ip_port = ip_ports.id 
-WHERE ip_port_certificates.id IS NULL AND ip_ports.port = 443  AND ip_ports.last_seen > datetime('now', '-8 hours')
+WHERE ip_ports.port = 443 
+AND ip_ports.last_seen > datetime('now', '-8 hours')
+AND (ip_port_certificates.id IS NULL OR ip_port_certificates.last_seen < datetime('now', '-4 hours'))
 `
 
 type dbId struct {

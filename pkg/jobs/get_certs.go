@@ -66,9 +66,13 @@ func CheckCerts() {
 					if portCert, err := model.IPPortCertificateFirstOrCreate(result[i].IPPort.Id(), certRecord.Id()); err != nil {
 						logger.Error("failed to create cert port", "error", err)
 						continue
-					} else if err := portCert.Save(); err != nil {
-						logger.Error("failed to save cert", "error", err)
-						continue
+					} else {
+						portCert.SetLastSeen(time.Now())
+
+						if err := portCert.Save(); err != nil {
+							logger.Error("failed to save cert", "error", err)
+							continue
+						}
 					}
 				}
 			}
