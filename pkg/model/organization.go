@@ -40,7 +40,30 @@ func (a *Organization) SubdomainTakeovers() ([]sulfur.SubdomainTakeover, error) 
 	err := app_state.GetApp().DB().
 		Select("*").
 		From("subdomain_takeovers").
-		AndWhere(dbx.Like("org_id", a.Id())).
+		AndWhere(dbx.NewExp("org_id={:org_id}", dbx.Params{"org_id": a.Id()})).
+		All(&results)
+
+	return results, err
+}
+
+func (a *Organization) BadCertificates() ([]sulfur.BadCertificate, error) {
+	var results []sulfur.BadCertificate
+	err := app_state.GetApp().DB().
+		Select(
+			"id",
+			"COALESCE(artifact_id, '') AS artifact_id",
+			"domain",
+			"ip_address",
+			"fingerprint",
+			"subject",
+			"alternative_names",
+			"COALESCE(external_id, '') as external_id",
+			"COALESCE(external_name, '') as external_name",
+			"organization",
+			"certificate",
+			"root_domain").
+		From("bad_certificates").
+		AndWhere(dbx.NewExp("organization={:org_id}", dbx.Params{"org_id": a.Id()})).
 		All(&results)
 
 	return results, err

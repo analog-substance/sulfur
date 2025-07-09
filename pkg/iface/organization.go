@@ -7,4 +7,5 @@ type Organization interface {
 	Save() error
 	Id() string
 	SubdomainTakeovers() ([]sulfur.SubdomainTakeover, error)
+	BadCertificates() ([]sulfur.BadCertificate, error)
 }

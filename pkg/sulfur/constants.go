@@ -1,6 +1,7 @@
 package sulfur
 
 const ExportOrgSubdomainTakeovers = "/export/org/{org_id}/takeovers"
+const ExportOrgBadCertificate = "/export/org/{org_id}/bad_certificates"
 const ImportDNSRecordsPath = "/consume/dns_records"
 const ImportDomainAndResolvePath = "/consume/domains/resolve"
 const ImportOrgRootDomainsPath = "/import/org/{org_id}/assets/root_domains"

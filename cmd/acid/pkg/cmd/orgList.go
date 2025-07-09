@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -18,8 +19,16 @@ var orgListCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		for _, org := range orgsListResponse.Items {
-			fmt.Println(org.Name, org.Id)
+		if jsonOutput {
+			outBytes, err := json.MarshalIndent(orgsListResponse.Items, "", "  ")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(outBytes))
+		} else {
+			for _, org := range orgsListResponse.Items {
+				fmt.Println(org.Name, org.Id)
+			}
 		}
 	},
 }

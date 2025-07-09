@@ -136,12 +136,12 @@ func (a *APIClient) GetStruct(path string, resStruc any) error {
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		//return nil, err
-		return err
+		return errors.Join(errors.New("error getting response body"), err)
 	}
 	err = json.Unmarshal(responseBody, resStruc)
 	if err != nil {
 		//return nil, err
-		return err
+		return errors.Join(errors.New("error parsing json: "+string(responseBody)), err)
 	}
 	return nil
 }
@@ -259,6 +259,18 @@ func (a *APIClient) ListOrgIPAddresses(orgId string) (*sulfur.OrgIpAddressesList
 func (a *APIClient) ListOrgSubDomainTakeovers(orgId string) ([]sulfur.SubdomainTakeover, error) {
 	resStruct := []sulfur.SubdomainTakeover{}
 	apiPath := strings.Replace(sulfur.ExportOrgSubdomainTakeovers, "{org_id}", orgId, -1)
+
+	err := a.GetStruct(apiPath, &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return resStruct, nil
+}
+
+func (a *APIClient) ListOrgBadCertificates(orgId string) ([]sulfur.BadCertificate, error) {
+	resStruct := []sulfur.BadCertificate{}
+	apiPath := strings.Replace(sulfur.ExportOrgBadCertificate, "{org_id}", orgId, -1)
 
 	err := a.GetStruct(apiPath, &resStruct)
 	if err != nil {

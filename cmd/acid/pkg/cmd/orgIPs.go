@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -19,9 +20,19 @@ var orgIPsCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, d := range res.Items {
-			fmt.Println(d.Expand.IpAddress.Address)
+
+		if jsonOutput {
+			outBytes, err := json.MarshalIndent(res.Items, "", "  ")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(outBytes))
+		} else {
+			for _, d := range res.Items {
+				fmt.Println(d.Expand.IpAddress.Address)
+			}
 		}
+
 	},
 }
 
