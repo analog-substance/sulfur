@@ -1,6 +1,7 @@
 package sulfur
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/analog-substance/sulfur/pkg/sulfur"
 )
@@ -16,4 +17,18 @@ func (a *APIClient) ListDNSRecords() (*sulfur.DNSRecordListResponse, error) {
 	}
 
 	return &resStruct, nil
+}
+
+func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) error {
+	body, err := json.Marshal(domainsToImport)
+	if err != nil {
+		return err
+	}
+
+	resp, err := a.PostJSON(sulfur.ImportDNSRecordsPath, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
 }

@@ -15,7 +15,7 @@ var importDomainCmd = &cobra.Command{
 	Long: `For example:
 
 	acid import domain test.google.com
-	as-crt-slurp.sh | acid import domain -s
+	as-crt-slurp.sh | acid domain import -s
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		serverResolve, _ := cmd.Flags().GetBool("server-resolve")

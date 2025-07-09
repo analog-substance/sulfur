@@ -85,12 +85,13 @@ func ImportDNSRecords(records []sulfur.DNSRecord) {
 			extRef, err := model.ExternalReferenceFirstOrCreate(record.ExternalReference)
 			if err != nil {
 				logger.Error("unable to find or create external reference", "extRef", record.ExternalReference, "err", err)
+			} else {
+				if err := extRef.Save(); err != nil {
+					logger.Error("unable to save external reference", "extRef", record.ExternalReference, "err", err)
+				} else {
+					dnsr.SetExternalReference(extRef)
+				}
 			}
-			if err := extRef.Save(); err != nil {
-				logger.Error("unable to save external reference", "extRef", record.ExternalReference, "err", err)
-			}
-
-			dnsr.SetExternalReference(extRef)
 		}
 
 		err = dnsr.Save()

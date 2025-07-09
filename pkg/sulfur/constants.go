@@ -1,9 +1,10 @@
 package sulfur
 
-const ExportOrgSubdomainTakeovers = "/export/org/{org_id}/takeovers"
-const ExportOrgBadCertificate = "/export/org/{org_id}/bad_certificates"
+const ExportOrgSubdomainTakeoversPath = "/export/org/{org_id}/takeovers"
+const ExportOrgBadCertificatePath = "/export/org/{org_id}/bad_certificates"
 const ImportDNSRecordsPath = "/consume/dns_records"
 const ImportDomainAndResolvePath = "/consume/domains/resolve"
+const ImportExternalReferencesPath = "/import/external_references"
 const ImportOrgRootDomainsPath = "/import/org/{org_id}/assets/root_domains"
 const ImportOrgIPAddressesPath = "/import/org/{org_id}/assets/ip_addresses"
 const AuthUserPath = "/api/collections/users/auth-with-password"
@@ -13,3 +14,4 @@ const OrgDomainsPath = "/api/collections/org_domains/records"
 const OrgIPAddressesPath = "/api/collections/org_ip_addresses/records"
 const OrganizationsPath = "/api/collections/organizations/records"
 const DNSRecordsPath = "/api/collections/dns_records/records"
+const ExternalReferencesPath = "/api/collections/external_references/records"

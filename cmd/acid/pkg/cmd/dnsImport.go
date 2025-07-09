@@ -15,7 +15,7 @@ var importDNSCmd = &cobra.Command{
 	Short: "import DNS records",
 	Long: `For example:
 
-	acid import dns --json dns.json
+	acid dns import --json dns.json
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		recordName, _ := cmd.Flags().GetString("name")

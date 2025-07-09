@@ -168,20 +168,6 @@ func (a *APIClient) ListRootDomains() (*sulfur.RootDomainsListResponse, error) {
 	return &resStruct, nil
 }
 
-func (a *APIClient) ImportDNSRecords(domainsToImport []sulfur.DNSRecord) error {
-	body, err := json.Marshal(domainsToImport)
-	if err != nil {
-		return err
-	}
-
-	resp, err := a.PostJSON(sulfur.ImportDNSRecordsPath, body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	return nil
-}
-
 func (a *APIClient) ImportDomainAndResolve(domainsToImport []string) error {
 	body, err := json.Marshal(domainsToImport)
 	if err != nil {
@@ -258,7 +244,7 @@ func (a *APIClient) ListOrgIPAddresses(orgId string) (*sulfur.OrgIpAddressesList
 
 func (a *APIClient) ListOrgSubDomainTakeovers(orgId string) ([]sulfur.SubdomainTakeover, error) {
 	resStruct := []sulfur.SubdomainTakeover{}
-	apiPath := strings.Replace(sulfur.ExportOrgSubdomainTakeovers, "{org_id}", orgId, -1)
+	apiPath := strings.Replace(sulfur.ExportOrgSubdomainTakeoversPath, "{org_id}", orgId, -1)
 
 	err := a.GetStruct(apiPath, &resStruct)
 	if err != nil {
@@ -270,7 +256,7 @@ func (a *APIClient) ListOrgSubDomainTakeovers(orgId string) ([]sulfur.SubdomainT
 
 func (a *APIClient) ListOrgBadCertificates(orgId string) ([]sulfur.BadCertificate, error) {
 	resStruct := []sulfur.BadCertificate{}
-	apiPath := strings.Replace(sulfur.ExportOrgBadCertificate, "{org_id}", orgId, -1)
+	apiPath := strings.Replace(sulfur.ExportOrgBadCertificatePath, "{org_id}", orgId, -1)
 
 	err := a.GetStruct(apiPath, &resStruct)
 	if err != nil {
