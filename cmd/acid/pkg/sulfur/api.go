@@ -228,13 +228,27 @@ func (a *APIClient) ListOrgDomains(orgId string) (*sulfur.OrgDomainsListResponse
 	return &resStruct, nil
 }
 
+func (a *APIClient) ListOrgPorts(orgId string) (*sulfur.OrgIPPortListResponse, error) {
+	resStruct := sulfur.OrgIPPortListResponse{}
+
+	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
+	expand := "root_domain,organization"
+
+	err := a.GetStruct(fmt.Sprintf("%s?filter=%s&expand=%s", sulfur.OrgIPPortsPath, filter, expand), &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resStruct, nil
+}
+
 func (a *APIClient) ListOrgIPAddresses(orgId string) (*sulfur.OrgIpAddressesListResponse, error) {
 	resStruct := sulfur.OrgIpAddressesListResponse{}
 
 	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
 	expand := "ip_address,organization"
 
-	err := a.GetStruct(fmt.Sprintf("%s?filter=%s&expand=%s", sulfur.OrgIPAddressesPath, filter, expand), &resStruct)
+	err := a.GetStruct(fmt.Sprintf("%s?limit=1000&filter=%s&expand=%s", sulfur.OrgIPAddressesPath, filter, expand), &resStruct)
 	if err != nil {
 		return nil, err
 	}
