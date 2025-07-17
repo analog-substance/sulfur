@@ -27,6 +27,6 @@ var orgPortsCmd = &cobra.Command{
 
 func init() {
 
-	orgCmd.AddCommand(orgRootDomainsCmd)
+	orgCmd.AddCommand(orgPortsCmd)
 
 }
