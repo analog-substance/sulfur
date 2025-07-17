@@ -11,7 +11,7 @@ import (
 var portsToScan = []int{}
 
 func init() {
-	portsToScan = copper.GetTopPopularPorts("tcp", 20)
+	portsToScan = copper.GetTopPopularPorts("tcp", 1000)
 }
 
 type SimplePortScanResults struct {
