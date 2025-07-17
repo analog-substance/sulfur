@@ -228,32 +228,55 @@ func (a *APIClient) ListOrgDomains(orgId string) (*sulfur.OrgDomainsListResponse
 	return &resStruct, nil
 }
 
-func (a *APIClient) ListOrgPorts(orgId string) (*sulfur.OrgIPPortListResponse, error) {
+func (a *APIClient) ListOrgPorts(orgId string) ([]sulfur.OrgIPPort, error) {
 	resStruct := sulfur.OrgIPPortListResponse{}
 
 	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
 	expand := "root_domain,organization"
+	page := 1
 
-	err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&filter=%s&expand=%s", sulfur.OrgIPPortsPath, filter, expand), &resStruct)
-	if err != nil {
-		return nil, err
+	retItems := []sulfur.OrgIPPort{}
+
+	for {
+		err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&page=%d&filter=%s&expand=%s", sulfur.OrgIPPortsPath, page, filter, expand), &resStruct)
+		if err != nil {
+			return nil, err
+		}
+
+		retItems = append(retItems, resStruct.Items...)
+
+		if resStruct.Page >= resStruct.TotalPages {
+			break
+		}
+		page++
 	}
 
-	return &resStruct, nil
+	return retItems, nil
 }
 
-func (a *APIClient) ListOrgIPAddresses(orgId string) (*sulfur.OrgIpAddressesListResponse, error) {
+func (a *APIClient) ListOrgIPAddresses(orgId string) ([]sulfur.OrgIPAddress, error) {
 	resStruct := sulfur.OrgIpAddressesListResponse{}
-
 	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
 	expand := "ip_address,organization"
+	page := 1
 
-	err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&filter=%s&expand=%s", sulfur.OrgIPAddressesPath, filter, expand), &resStruct)
-	if err != nil {
-		return nil, err
+	retItems := []sulfur.OrgIPAddress{}
+
+	for {
+		err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&page=%d&filter=%s&expand=%s", sulfur.OrgIPAddressesPath, page, filter, expand), &resStruct)
+		if err != nil {
+			return nil, err
+		}
+
+		retItems = append(retItems, resStruct.Items...)
+
+		if resStruct.Page >= resStruct.TotalPages {
+			break
+		}
+		page++
 	}
 
-	return &resStruct, nil
+	return retItems, nil
 }
 
 func (a *APIClient) ListOrgSubDomainTakeovers(orgId string) ([]sulfur.SubdomainTakeover, error) {

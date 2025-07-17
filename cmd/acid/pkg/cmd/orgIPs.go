@@ -22,13 +22,13 @@ var orgIPsCmd = &cobra.Command{
 		}
 
 		if jsonOutput {
-			outBytes, err := json.MarshalIndent(res.Items, "", "  ")
+			outBytes, err := json.MarshalIndent(res, "", "  ")
 			if err != nil {
 				log.Fatal(err)
 			}
 			fmt.Println(string(outBytes))
 		} else {
-			for _, d := range res.Items {
+			for _, d := range res {
 				fmt.Println(d.Expand.IpAddress.Address)
 			}
 		}

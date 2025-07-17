@@ -19,7 +19,7 @@ var orgPortsCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, d := range res.Items {
+		for _, d := range res {
 			fmt.Println(d.Address, d.Port)
 		}
 	},
