@@ -10,11 +10,10 @@ require (
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.28.4
 	github.com/projectdiscovery/dnsx v1.2.2
-	github.com/projectdiscovery/retryabledns v1.0.103
+	github.com/projectdiscovery/retryabledns v1.0.105
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/net v0.41.0
-
 )
 
 exclude github.com/zmap/zcrypto v0.0.0-20250418211859-7510c141e4b7 // indirect
@@ -53,7 +52,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
 	github.com/projectdiscovery/cdncheck v1.1.26 // indirect
-	github.com/projectdiscovery/utils v0.4.21 // indirect
+	github.com/projectdiscovery/utils v0.4.22 // indirect
 	github.com/prometheus-community/pro-bing v0.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
