@@ -55,7 +55,7 @@ var orgIPsImportCmd = &cobra.Command{
 
 				err := sulfurAPIClient.ImportOrgIPAddresses(orgId, batch)
 				if err != nil {
-					log.Println("error importing dns records", err)
+					log.Println("error importing org ips", err)
 				}
 			}
 
