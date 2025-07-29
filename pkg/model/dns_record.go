@@ -84,8 +84,8 @@ func (a *DNSRecord) SetRootDomain(domain iface.RootDomain) {
 	a.Set("root_domain", domain.Id())
 }
 
-func (a *DNSRecord) SetExternalReference(domain iface.ExternalReference) {
-	a.Set("external_reference", domain.Id())
+func (a *DNSRecord) SetExternalReference(extRef iface.ExternalReference) {
+	a.Set("external_reference", extRef.Id())
 }
 func (a *DNSRecord) SetResolveErr(resolveErr string) {
 	a.Set("resolve_error", resolveErr)
@@ -266,9 +266,10 @@ func GetActiveIPs() ([]DNSScope, error) {
 
 const SQLPortScanQueue = `
 SELECT ip_addresses.address host
-FROM ip_addresses
-LEFT JOIN ip_ports ON ip_addresses.id=ip_ports.ip_address
-WHERE ip_addresses.is_private = false AND ip_addresses.is_shared = false AND ip_addresses.is_loopback = false
+FROM org_ip_addresses
+INNER JOIN ip_addresses on org_ip_addresses.ip_address = ip_addresses.id
+WHERE org_ip_addresses.last_seen > datetime('now', '-8 hours') 
+  AND ip_addresses.is_private = false AND ip_addresses.is_shared = false AND ip_addresses.is_loopback = false
   AND (ip_addresses.last_simple_port_scan IS NULL OR ip_addresses.last_simple_port_scan < datetime('now', '-4 hours'))
 GROUP BY ip_addresses.address
 LIMIT 1000

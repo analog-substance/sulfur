@@ -41,6 +41,10 @@ func (a *OrgIPAddress) SetLastSeen(lastSeen time.Time) {
 	a.Set("last_seen", lastSeen)
 }
 
+func (a *OrgIPAddress) SetExternalReference(extRef iface.ExternalReference) {
+	a.Set("external_reference", extRef.Id())
+}
+
 func OrgIPAddressFirstOrCreate(ipAddressId, orgId string) (iface.OrgIPAddress, error) {
 	dnsR := &OrgIPAddress{}
 

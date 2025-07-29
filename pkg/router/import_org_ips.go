@@ -5,6 +5,7 @@ import (
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"github.com/pocketbase/pocketbase/core"
 	"io"
 	"net/http"
@@ -20,7 +21,7 @@ func importOrgIPAddresses(e *core.RequestEvent) error {
 		return e.String(http.StatusNotFound, "invalid request")
 	}
 
-	ipAddresses := []string{}
+	ipAddresses := []sulfur.OrgIPAddressImport{}
 	jsonBytes, err := io.ReadAll(e.Request.Body)
 	if err != nil {
 		return e.String(http.StatusBadRequest, "invalid request body")
@@ -35,11 +36,11 @@ func importOrgIPAddresses(e *core.RequestEvent) error {
 	return e.String(http.StatusOK, "done")
 }
 
-func importOrgIPs(ipAddresses []string, org iface.Organization) {
+func importOrgIPs(ipAddresses []sulfur.OrgIPAddressImport, org iface.Organization) {
 	logger := app_state.GetApp().Logger().WithGroup("importOrgIPAddresses")
 	logger.Info("import org ip addresses started", "count", len(ipAddresses))
 	for _, ipAddress := range ipAddresses {
-		ipAddr, err := model.IPAddressFirstOrCreate(ipAddress)
+		ipAddr, err := model.IPAddressFirstOrCreate(ipAddress.IpAddress)
 		if err != nil {
 			logger.Error("cant find ip address", "err", err)
 			continue
@@ -59,6 +60,18 @@ func importOrgIPs(ipAddresses []string, org iface.Organization) {
 			continue
 		}
 
+		if ipAddress.ExternalReference != "" {
+			extRef, err := model.ExternalReferenceFirstOrCreate(ipAddress.ExternalReference)
+			if err != nil {
+				logger.Error("unable to find or create external reference", "extRef", ipAddress.ExternalReference, "err", err)
+			} else {
+				if err := extRef.Save(); err != nil {
+					logger.Error("unable to save external reference", "extRef", ipAddress.ExternalReference, "err", err)
+				} else {
+					orgIPAddr.SetExternalReference(extRef)
+				}
+			}
+		}
 		orgIPAddr.SetLastSeen(time.Now())
 
 		err = orgIPAddr.Save()

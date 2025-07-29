@@ -12,6 +12,7 @@ type OrgIPAddress interface {
 	SetIPAddress(string)
 	LastSeen() types.DateTime
 	SetLastSeen(lastSeen time.Time)
+	SetExternalReference(extRef ExternalReference)
 
 	//SubDomains() []OrgRootDomain
 	Save() error

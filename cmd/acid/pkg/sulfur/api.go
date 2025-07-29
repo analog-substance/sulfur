@@ -198,7 +198,7 @@ func (a *APIClient) ImportOrgRootDomains(orgId string, domainsToImport []sulfur.
 	return nil
 }
 
-func (a *APIClient) ImportOrgIPAddresses(orgId string, ipAddresses []string) error {
+func (a *APIClient) ImportOrgIPAddresses(orgId string, ipAddresses []sulfur.OrgIPAddressImport) error {
 	body, err := json.Marshal(ipAddresses)
 	if err != nil {
 		return err
