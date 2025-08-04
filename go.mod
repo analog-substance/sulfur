@@ -8,13 +8,12 @@ require (
 	github.com/miekg/dns v1.1.67
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pocketbase/dbx v1.11.0
-	github.com/pocketbase/pocketbase v0.29.0
+	github.com/pocketbase/pocketbase v0.29.1
 	github.com/projectdiscovery/dnsx v1.2.2
 	github.com/projectdiscovery/retryabledns v1.0.105
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/net v0.42.0
-
 )
 
 exclude github.com/zmap/zcrypto v0.0.0-20250418211859-7510c141e4b7 // indirect
