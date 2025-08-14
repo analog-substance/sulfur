@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/analog-substance/sulfur/cmd/acid/pkg/model"
-	"github.com/analog-substance/sulfur/pkg/sulfur"
 	"io"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/analog-substance/sulfur/cmd/acid/pkg/model"
+	"github.com/analog-substance/sulfur/pkg/sulfur"
 )
 
 func New(apiEndpoint, user, pass string) *APIClient {
@@ -228,7 +229,7 @@ func (a *APIClient) ListOrgDomains(orgId string) (*sulfur.OrgDomainsListResponse
 	return &resStruct, nil
 }
 
-func (a *APIClient) ListOrgPorts(orgId string) ([]sulfur.OrgIPPort, error) {
+func (a *APIClient) ListOrgIPPorts(orgId string) ([]sulfur.OrgIPPort, error) {
 	resStruct := sulfur.OrgIPPortListResponse{}
 
 	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
@@ -239,6 +240,32 @@ func (a *APIClient) ListOrgPorts(orgId string) ([]sulfur.OrgIPPort, error) {
 
 	for {
 		err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&page=%d&filter=%s&expand=%s", sulfur.OrgIPPortsPath, page, filter, expand), &resStruct)
+		if err != nil {
+			return nil, err
+		}
+
+		retItems = append(retItems, resStruct.Items...)
+
+		if resStruct.Page >= resStruct.TotalPages {
+			break
+		}
+		page++
+	}
+
+	return retItems, nil
+}
+
+func (a *APIClient) ListOrgDomainPorts(orgId string) ([]sulfur.OrgDomainPort, error) {
+	resStruct := sulfur.OrgDomainPortListResponse{}
+
+	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
+	expand := "root_domain,organization"
+	page := 1
+
+	retItems := []sulfur.OrgDomainPort{}
+
+	for {
+		err := a.GetStruct(fmt.Sprintf("%s?perPage=1000&page=%d&filter=%s&expand=%s", sulfur.OrgDomainPortsPath, page, filter, expand), &resStruct)
 		if err != nil {
 			return nil, err
 		}

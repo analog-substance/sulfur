@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 // orgPortsCmd represents the add command
@@ -14,13 +15,32 @@ var orgPortsCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		orgId := getRequiredOrgFlag(cmd)
+		getDomains, _ := cmd.Flags().GetBool("domains")
+		getIPs, _ := cmd.Flags().GetBool("ips")
 
-		res, err := sulfurAPIClient.ListOrgPorts(orgId)
-		if err != nil {
-			log.Fatal(err)
+		if !getDomains && !getIPs {
+			getDomains = true
 		}
-		for _, d := range res {
-			fmt.Println(d.Address, d.Port)
+
+		if getDomains {
+
+			res, err := sulfurAPIClient.ListOrgDomainPorts(orgId)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, d := range res {
+				fmt.Println(d.Domain, d.Port)
+			}
+		}
+
+		if getIPs {
+			res, err := sulfurAPIClient.ListOrgIPPorts(orgId)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, d := range res {
+				fmt.Println(d.Address, d.Port)
+			}
 		}
 	},
 }
@@ -28,5 +48,7 @@ var orgPortsCmd = &cobra.Command{
 func init() {
 
 	orgCmd.AddCommand(orgPortsCmd)
+	orgPortsCmd.Flags().BoolP("domains", "d", false, "Get domain ports")
+	orgPortsCmd.Flags().BoolP("ips", "i", false, "Get ip ports")
 
 }
