@@ -2,10 +2,11 @@ package jobs
 
 import (
 	"errors"
+	"time"
+
 	copper "github.com/analog-substance/copper/pkg/lib"
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/model"
-	"time"
 )
 
 var portsToScan = []int{}
@@ -38,7 +39,7 @@ func SimplePortScanWorkers() {
 	input := make(chan *SimplePortScanResults, total)
 	output := make(chan *SimplePortScanResults, total)
 
-	for w := 1; w <= 20; w++ {
+	for w := 1; w <= total; w++ {
 		go PortScanWorker(input, output)
 	}
 

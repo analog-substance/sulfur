@@ -290,8 +290,10 @@ WHERE ip_addresses.is_private = false
 GROUP BY ip_addresses.address
 ORDER BY CASE WHEN ip_addresses.last_simple_port_scan = "" then 0 else 1 END,
     ip_addresses.last_simple_port_scan DESC NULLS FIRST
-LIMIT 200
+LIMIT 100 
 `
+
+//-- we are scanning each ip in its own goroutine, which scans each port in its goroutine. so total_go_routines = (ip_count * port_count)
 
 func GetSimplePortScanInput() ([]DNSScope, error) {
 	accounts := []DNSScope{}
