@@ -276,15 +276,15 @@ WHERE ip_addresses.is_private = false
   AND ip_addresses.is_loopback = false
   AND (
     ip_addresses.last_simple_port_scan IS NULL
-        OR ip_addresses.last_simple_port_scan < datetime('now', '-24 hours')
+        OR ip_addresses.last_simple_port_scan < datetime('now', '-12 hours')
     )
   AND (
     (
         org_ip_addresses.id IS NOT NULL
-            AND org_ip_addresses.last_seen > datetime('now', '-12 hours')
+            AND org_ip_addresses.last_seen > datetime('now', '-24 hours')
         ) OR (
         org_domains.id IS NOT NULL
-            AND dns_records.last_seen < datetime('now', '-12 hours')
+            AND dns_records.last_seen < datetime('now', '-24 hours')
         )
     )
 GROUP BY ip_addresses.address
