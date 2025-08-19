@@ -1,15 +1,16 @@
 package model
 
 import (
+	"log"
+	"net"
+	"strings"
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"log"
-	"net"
-	"strings"
-	"time"
 )
 
 const DNSRecordCollection = "dns_records"
@@ -265,14 +266,31 @@ func GetActiveIPs() ([]DNSScope, error) {
 }
 
 const SQLPortScanQueue = `
-SELECT ip_addresses.address host
-FROM org_ip_addresses
-INNER JOIN ip_addresses on org_ip_addresses.ip_address = ip_addresses.id
-WHERE org_ip_addresses.last_seen > datetime('now', '-8 hours') 
-  AND ip_addresses.is_private = false AND ip_addresses.is_shared = false AND ip_addresses.is_loopback = false
-  AND (ip_addresses.last_simple_port_scan IS NULL OR ip_addresses.last_simple_port_scan < datetime('now', '-4 hours'))
+SELECT ip_addresses.address host, ip_addresses.last_simple_port_scan
+FROM ip_addresses
+         LEFT JOIN org_ip_addresses on org_ip_addresses.ip_address = ip_addresses.id
+         LEFT JOIN dns_records on dns_records.value=ip_addresses.address
+         LEFT JOIN org_domains on dns_records.root_domain=org_domains.root_domain
+WHERE ip_addresses.is_private = false
+  AND ip_addresses.is_shared = false
+  AND ip_addresses.is_loopback = false
+  AND (
+    ip_addresses.last_simple_port_scan IS NULL
+        OR ip_addresses.last_simple_port_scan < datetime('now', '-24 hours')
+    )
+  AND (
+    (
+        org_ip_addresses.id IS NOT NULL
+            AND org_ip_addresses.last_seen > datetime('now', '-12 hours')
+        ) OR (
+        org_domains.id IS NOT NULL
+            AND dns_records.last_seen < datetime('now', '-12 hours')
+        )
+    )
 GROUP BY ip_addresses.address
-LIMIT 1000
+ORDER BY CASE WHEN ip_addresses.last_simple_port_scan = "" then 0 else 1 END,
+    ip_addresses.last_simple_port_scan DESC NULLS FIRST
+LIMIT 200
 `
 
 func GetSimplePortScanInput() ([]DNSScope, error) {
