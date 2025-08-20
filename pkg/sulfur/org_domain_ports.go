@@ -6,9 +6,12 @@ type OrgDomainPort struct {
 	Id             string `json:"id"`
 	Organization   string `json:"organization"`
 	Domain         string `json:"domain"`
+	RootDomain     string `json:"root_domain"`
 	Port           int    `json:"port"`
+	Total          int    `json:"total"`
 	Service        string `json:"service"`
 	LastSeen       string `json:"last_seen"`
+	Created        string `json:"created"`
 }
 
 type OrgDomainPortListResponse struct {
