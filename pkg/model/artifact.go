@@ -1,12 +1,13 @@
 package model
 
 import (
+	"log"
+
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/filesystem"
-	"log"
 )
 
 const ArtifactCollection = "artifacts"
@@ -94,6 +95,39 @@ func GetDNSRecordsNeedingArtifacts() ([]iface.DNSRecord, error) {
 	err := app_state.GetApp().DB().
 		Select("*").
 		From("bad_certificates").
+		AndWhere(dbx.NewExp("artifact_id IS NULL")).
+		All(&result)
+
+	idSlice := []interface{}{}
+	for _, record := range result {
+		idSlice = append(idSlice, record.Id)
+	}
+
+	records, err := app_state.GetApp().FindAllRecords(DNSRecordCollection,
+		dbx.In("id", idSlice...),
+	)
+
+	for _, record := range records {
+
+		// load into proxy
+		proxyRec := &DNSRecord{}
+		proxyRec.SetProxyRecord(record)
+
+		ret = append(ret, proxyRec)
+	}
+
+	return ret, err
+
+}
+
+func GetTakeoversNeedingArtifacts() ([]iface.DNSRecord, error) {
+	ret := []iface.DNSRecord{}
+
+	var result []dbId
+
+	err := app_state.GetApp().DB().
+		Select("*").
+		From("subdomain_takeovers").
 		AndWhere(dbx.NewExp("artifact_id IS NULL")).
 		All(&result)
 

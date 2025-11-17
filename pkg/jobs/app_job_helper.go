@@ -1,9 +1,10 @@
 package jobs
 
 import (
-	"github.com/analog-substance/sulfur/pkg/app_state"
 	"sync"
 	"time"
+
+	"github.com/analog-substance/sulfur/pkg/app_state"
 )
 
 func AddJobs() {
@@ -13,6 +14,7 @@ func AddJobs() {
 	AddJob("Check Certs", "*/1 * * * *", CheckCerts)
 	AddJob("Get Domains From Certificates", "10 1 * * *", ResolveCertificateDomains)
 	AddJob("Capture Bad Cert Screenshots", "*/5 * * * *", BadCertArtifacts)
+	AddJob("Capture Subdomain Takeover Screenshots", "3-59/5 * * * *", SubdomainTakeoverArtifacts)
 
 }
 
