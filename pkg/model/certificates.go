@@ -1,13 +1,16 @@
 package model
 
 import (
+	"fmt"
+	"math/big"
+	"strings"
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"strings"
-	"time"
 )
 
 const CertificateCollection = "certificates"
@@ -51,7 +54,7 @@ func (a *Certificate) Issued() types.DateTime {
 	return a.GetDateTime("issued")
 }
 
-func (a *Certificate) SetIssued(lastSeen time.Time) {
+func (a *Certificate) SetNotBefore(lastSeen time.Time) {
 	a.Set("issued", lastSeen)
 }
 func (a *Certificate) Expires() types.DateTime {
@@ -60,6 +63,25 @@ func (a *Certificate) Expires() types.DateTime {
 
 func (a *Certificate) SetExpires(lastSeen time.Time) {
 	a.Set("expires", lastSeen)
+}
+
+func (a *Certificate) SetSerial(serialNumber *big.Int) {
+
+	bytes := serialNumber.Bytes()
+	hexWithColons := ""
+	for i, b := range bytes {
+		hexWithColons += fmt.Sprintf("%02x", b)
+		if i < len(bytes)-1 {
+			hexWithColons += ":"
+		}
+	}
+
+	//// Convert the big.Int serial number to a byte slice
+	//serialBytes := serialNumber.Bytes()
+	//// Encode the byte slice to a hexadecimal string
+	//serialHex := hex.EncodeToString(serialBytes)
+
+	a.Set("serial", hexWithColons)
 }
 
 func CertificateFirstOrCreate(fingerprint string) (iface.Certificate, error) {

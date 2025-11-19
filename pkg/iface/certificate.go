@@ -1,8 +1,10 @@
 package iface
 
 import (
-	"github.com/pocketbase/pocketbase/tools/types"
+	"math/big"
 	"time"
+
+	"github.com/pocketbase/pocketbase/tools/types"
 )
 
 type Certificate interface {
@@ -18,8 +20,9 @@ type Certificate interface {
 	AlternativeNames() string
 	SetAlternativeNames(val string)
 	Issued() types.DateTime
-	SetIssued(lastSeen time.Time)
+	SetNotBefore(lastSeen time.Time)
 	Expires() types.DateTime
 	SetExpires(lastSeen time.Time)
+	SetSerial(serialNumber *big.Int)
 	Id() string
 }

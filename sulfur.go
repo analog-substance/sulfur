@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/analog-substance/sulfur/pkg/pb_util"
-	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/analog-substance/sulfur/pkg/pb_util"
+	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	_ "github.com/analog-substance/sulfur/migrations"
 	"github.com/pocketbase/pocketbase"

@@ -6,11 +6,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/analog-substance/sulfur/pkg/model"
-	"strings"
-	"time"
 )
 
 type CheckCertStatus struct {
@@ -54,9 +55,13 @@ func CheckCerts() {
 					}
 					certRecord.SetSubject(strings.ToLower(cert.Subject.CommonName))
 					certRecord.SetAlternativeNames(strings.ToLower(strings.Join(cert.DNSNames, ",")))
-					certRecord.SetIssuer(cert.Issuer.CommonName)
-					certRecord.SetIssued(cert.NotBefore)
+					certRecord.SetIssuer(strings.Join(cert.Issuer.Organization, ", "))
+					certRecord.SetNotBefore(cert.NotBefore)
 					certRecord.SetExpires(cert.NotAfter)
+					certRecord.SetSerial(cert.SerialNumber)
+
+					fmt.Printf("%x", cert.SerialNumber)
+					logger.Info("Cert Serial Number", "x", fmt.Sprintf("%x", cert.SerialNumber), "s", fmt.Sprintf("%s", cert.SerialNumber), "ss", fmt.Sprintf("%s", cert.SerialNumber.String()), "d", fmt.Sprintf("%d", cert.SerialNumber))
 
 					if err := certRecord.Save(); err != nil {
 						logger.Error("failed to save cert", "error", err, "subject", cert.Subject, "issuer", cert.Issuer)
