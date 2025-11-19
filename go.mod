@@ -14,6 +14,8 @@ require (
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.21.0
 	golang.org/x/net v0.47.0
+	modernc.org/libc v1.66.10
+
 )
 
 exclude github.com/zmap/zcrypto v0.0.0-20250418211859-7510c141e4b7 // indirect
@@ -83,7 +85,6 @@ require (
 	golang.org/x/tools v0.39.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.67.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.40.0 // indirect
