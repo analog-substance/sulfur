@@ -19,7 +19,7 @@ type Certificate interface {
 	SetSubject(val string)
 	AlternativeNames() string
 	SetAlternativeNames(val string)
-	Issued() types.DateTime
+	NotBefore() types.DateTime
 	SetNotBefore(lastSeen time.Time)
 	Expires() types.DateTime
 	SetExpires(lastSeen time.Time)

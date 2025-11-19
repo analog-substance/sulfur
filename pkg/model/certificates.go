@@ -50,12 +50,12 @@ func (a *Certificate) SetAlternativeNames(val string) {
 	a.Set("alternative_names", val)
 }
 
-func (a *Certificate) Issued() types.DateTime {
-	return a.GetDateTime("issued")
+func (a *Certificate) NotBefore() types.DateTime {
+	return a.GetDateTime("not_before")
 }
 
 func (a *Certificate) SetNotBefore(lastSeen time.Time) {
-	a.Set("issued", lastSeen)
+	a.Set("not_before", lastSeen)
 }
 func (a *Certificate) Expires() types.DateTime {
 	return a.GetDateTime("expires")
