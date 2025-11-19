@@ -60,9 +60,6 @@ func CheckCerts() {
 					certRecord.SetExpires(cert.NotAfter)
 					certRecord.SetSerial(cert.SerialNumber)
 
-					fmt.Printf("%x", cert.SerialNumber)
-					logger.Info("Cert Serial Number", "x", fmt.Sprintf("%x", cert.SerialNumber), "s", fmt.Sprintf("%s", cert.SerialNumber), "ss", fmt.Sprintf("%s", cert.SerialNumber.String()), "d", fmt.Sprintf("%d", cert.SerialNumber))
-
 					if err := certRecord.Save(); err != nil {
 						logger.Error("failed to save cert", "error", err, "subject", cert.Subject, "issuer", cert.Issuer)
 						continue
