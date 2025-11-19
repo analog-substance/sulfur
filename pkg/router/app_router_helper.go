@@ -15,6 +15,7 @@ func AttachRoutes(se *core.ServeEvent) error {
 	se.Router.POST(sulfur.ImportOrgIPAddressesPath, importOrgIPAddresses).Bind(apis.RequireSuperuserAuth())
 	se.Router.POST(sulfur.ImportOrgRootDomainsPath, importOrgRootDomains).Bind(apis.RequireSuperuserAuth())
 	se.Router.POST(sulfur.ImportExternalReferencesPath, importExternalRefsRoute).Bind(apis.RequireSuperuserAuth())
+	se.Router.POST(sulfur.ImportOrgCertificatesPath, importOrgCertificatesRoute).Bind(apis.RequireSuperuserAuth())
 
 	return se.Next()
 }

@@ -4,8 +4,6 @@ import (
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
-	"time"
 )
 
 const IPPortCertificateCollection = "ip_port_certificates"
@@ -14,7 +12,7 @@ const IPPortCertificateCollection = "ip_port_certificates"
 var _ core.RecordProxy = (*IPPortCertificate)(nil)
 
 type IPPortCertificate struct {
-	SulfurRecordProxy
+	LastSeenRecordProxy
 }
 
 func (a *IPPortCertificate) IPPort() string {
@@ -29,14 +27,6 @@ func (a *IPPortCertificate) Certificate() string {
 }
 func (a *IPPortCertificate) SetCertificate(val string) {
 	a.Set("certificate", val)
-}
-
-func (a *IPPortCertificate) LastSeen() types.DateTime {
-	return a.GetDateTime("last_seen")
-}
-
-func (a *IPPortCertificate) SetLastSeen(lastSeen time.Time) {
-	a.Set("last_seen", lastSeen)
 }
 
 func IPPortCertificateFirstOrCreate(ip_port, certificate string) (iface.IPPortCertificate, error) {

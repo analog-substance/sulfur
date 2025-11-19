@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/analog-substance/sulfur/pkg/app_state"
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
 )
 
 const IPPortCollection = "ip_ports"
@@ -19,7 +17,7 @@ const IPPortCollection = "ip_ports"
 var _ core.RecordProxy = (*IPPort)(nil)
 
 type IPPort struct {
-	SulfurRecordProxy
+	LastSeenRecordProxy
 }
 
 func (a *IPPort) IPAddress() string {
@@ -61,14 +59,6 @@ func (a *IPPort) Protocol() string {
 }
 func (a *IPPort) SetProtocol(val string) {
 	a.Set("protocol", val)
-}
-
-func (a *IPPort) LastSeen() types.DateTime {
-	return a.GetDateTime("last_seen")
-}
-
-func (a *IPPort) SetLastSeen(lastSeen time.Time) {
-	a.Set("last_seen", lastSeen)
 }
 
 func (a *IPPort) GetIP() iface.IPAddress {

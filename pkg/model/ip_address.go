@@ -1,12 +1,13 @@
 package model
 
 import (
+	"log"
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"log"
-	"time"
 )
 
 const IPAddressesCollection = "ip_addresses"
@@ -15,7 +16,7 @@ const IPAddressesCollection = "ip_addresses"
 var _ core.RecordProxy = (*IPAddress)(nil)
 
 type IPAddress struct {
-	SulfurRecordProxy
+	LastSeenRecordProxy
 }
 
 func (a *IPAddress) Address() string {
@@ -111,14 +112,6 @@ func (a *IPAddress) IsEphemeral() bool {
 
 func (a *IPAddress) SetIsEphemeral(val bool) {
 	a.Set("is_ephemeral", val)
-}
-
-func (a *IPAddress) LastSeen() types.DateTime {
-	return a.GetDateTime("last_seen")
-}
-
-func (a *IPAddress) SetLastSeen(lastSeen time.Time) {
-	a.Set("last_seen", lastSeen)
 }
 
 func (a *IPAddress) LastSimplePortScan() types.DateTime {

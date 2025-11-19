@@ -1,11 +1,12 @@
 package model
 
 import (
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"time"
 )
 
 const OrgIPAddressCollection = "org_ip_addresses"
@@ -14,11 +15,7 @@ const OrgIPAddressCollection = "org_ip_addresses"
 var _ core.RecordProxy = (*OrgIPAddress)(nil)
 
 type OrgIPAddress struct {
-	SulfurRecordProxy
-}
-
-func (a *OrgIPAddress) Organization() string {
-	return a.GetString("organization")
+	OrganizationRecordProxy
 }
 
 func (a *OrgIPAddress) IPAddress() string {
@@ -27,10 +24,6 @@ func (a *OrgIPAddress) IPAddress() string {
 
 func (a *OrgIPAddress) LastSeen() types.DateTime {
 	return a.GetDateTime("last_seen")
-}
-
-func (a *OrgIPAddress) SetOrganization(org string) {
-	a.Set("organization", org)
 }
 
 func (a *OrgIPAddress) SetIPAddress(ipAddress string) {

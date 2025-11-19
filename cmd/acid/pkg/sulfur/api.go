@@ -330,6 +330,36 @@ func (a *APIClient) ListOrgBadCertificates(orgId string) ([]sulfur.BadCertificat
 	return resStruct, nil
 }
 
+func (a *APIClient) ListOrgCertificates(orgId string) (*sulfur.OrgCertificatesListResponse, error) {
+	resStruct := sulfur.OrgCertificatesListResponse{}
+
+	filter := fmt.Sprintf("organization%%3D'%s'", orgId)
+	expand := "organization"
+
+	err := a.GetStruct(fmt.Sprintf("%s?filter=%s&expand=%s", sulfur.OrgCertificatesPath, filter, expand), &resStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resStruct, nil
+}
+
+func (a *APIClient) ImportOrgCertificates(orgId string, certificatesToImport []sulfur.OrgCertificateImport) error {
+	body, err := json.Marshal(certificatesToImport)
+	if err != nil {
+		return err
+	}
+
+	apiPath := strings.Replace(sulfur.ImportOrgCertificatesPath, "{org_id}", orgId, -1)
+
+	resp, err := a.PostJSON(apiPath, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
 func AddCIDR(org string, cidr *model.CIDR) {
 
 	cidr.Organization = org

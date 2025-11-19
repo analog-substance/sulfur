@@ -26,7 +26,7 @@ func init() {
 }
 
 type DNSRecord struct {
-	SulfurRecordProxy
+	LastSeenRecordProxy
 }
 
 func (a *DNSRecord) RootDomain() iface.RootDomain {
@@ -59,10 +59,6 @@ func (a *DNSRecord) ResolveErrorCount() string {
 
 func (a *DNSRecord) LastResolved() types.DateTime {
 	return a.GetDateTime("last_resolved")
-}
-
-func (a *DNSRecord) LastSeen() types.DateTime {
-	return a.GetDateTime("last_seen")
 }
 
 func (a *DNSRecord) SetName(name string) {
@@ -98,10 +94,6 @@ func (a *DNSRecord) SetResolveErrCount(errCount int) {
 
 func (a *DNSRecord) SetLastResolved(lastResolved time.Time) {
 	a.Set("last_resolved", lastResolved)
-}
-
-func (a *DNSRecord) SetLastSeen(lastSeen time.Time) {
-	a.Set("last_seen", lastSeen)
 }
 
 func DNSRecordFirstOrCreate(recordName, recordValue, recordType string) (iface.DNSRecord, error) {

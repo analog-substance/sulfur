@@ -1,11 +1,12 @@
 package model
 
 import (
+	"time"
+
 	"github.com/analog-substance/sulfur/pkg/iface"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/types"
-	"time"
 )
 
 const OrgRootDomainCollection = "org_domains"
@@ -14,7 +15,7 @@ const OrgRootDomainCollection = "org_domains"
 var _ core.RecordProxy = (*OrgRootDomain)(nil)
 
 type OrgRootDomain struct {
-	SulfurRecordProxy
+	OrganizationRecordProxy
 }
 
 func (a *OrgRootDomain) Registrar() string {
