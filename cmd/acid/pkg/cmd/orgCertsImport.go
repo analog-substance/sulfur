@@ -37,7 +37,7 @@ var orgCertificatesImportCmd = &cobra.Command{
 		importRecordLen := len(importCertificates)
 		if importRecordLen > 0 {
 			batches := importRecordLen / batchSize
-			fmt.Printf("Importing %d Org IP addresses in %d batches\n", importRecordLen, batches)
+			fmt.Printf("Importing %d Org Certificates %d batches\n", importRecordLen, batches)
 
 			for len(importCertificates) > batchSize {
 				fmt.Printf("Sending batch %d\n", batches-(len(importCertificates)/batchSize))
@@ -46,7 +46,7 @@ var orgCertificatesImportCmd = &cobra.Command{
 
 				err := sulfurAPIClient.ImportOrgCertificates(orgId, batch)
 				if err != nil {
-					log.Println("error importing org ips", err)
+					log.Println("error importing org certs", err)
 				}
 			}
 
