@@ -58,6 +58,8 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 	}
 
 	defer func() {
+		time.Sleep(13 * time.Second)
+
 		if err := os.RemoveAll(userData); err != nil {
 			time.Sleep(3 * time.Second)
 			if err := os.RemoveAll(userData); err != nil {
