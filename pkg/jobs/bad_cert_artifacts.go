@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"time"
@@ -20,6 +21,7 @@ func init() {
 func BadCertArtifacts() {
 	logger := app_state.GetApp().Logger().WithGroup("BadCertArtifacts")
 	dnsRecords, err := model.GetDNSRecordsNeedingArtifacts()
+
 	if err != nil {
 		logger.Error("Error getting dns records", "error", err)
 		return
@@ -52,12 +54,16 @@ func BadCertArtifacts() {
 }
 
 func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
+	log.Println("getting screenshot for host", host, "ip", ip)
+
 	userData, err := os.MkdirTemp("", "sulfur-screenshot-*")
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
+		log.Println("Done screenshot for host", host, "ip", ip)
+
 		time.Sleep(13 * time.Second)
 
 		if err := os.RemoveAll(userData); err != nil {
@@ -66,6 +72,8 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 				logger.Error("failed to delete chrome data dir", "dir", userData, "err", err)
 			}
 		}
+		log.Println("FRDone screenshot for host", host, "ip", ip)
+
 	}()
 
 	// create context
@@ -101,6 +109,7 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 // Note: chromedp.FullScreenshot overrides the device's emulation settings. Use
 // device.Reset to reset the emulation and viewport settings.
 func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
+	log.Println("getting screenshot for url", urlstr)
 	return chromedp.Tasks{
 		chromedp.Sleep(2 * time.Second),
 		chromedp.FullScreenshot(res, quality),
