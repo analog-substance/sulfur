@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	golang.org/x/net v0.47.0
 	modernc.org/libc v1.66.10
-
+	modernc.org/sqlite v1.40.0
 )
 
 exclude github.com/zmap/zcrypto v0.0.0-20250418211859-7510c141e4b7 // indirect
@@ -54,7 +54,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
 	github.com/projectdiscovery/cdncheck v1.2.10 // indirect
-	github.com/projectdiscovery/utils v0.6.1 // indirect
+	github.com/projectdiscovery/utils v0.7.0 // indirect
 	github.com/prometheus-community/pro-bing v0.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
@@ -70,10 +70,10 @@ require (
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/weppos/publicsuffix-go v0.50.0 // indirect
+	github.com/weppos/publicsuffix-go v0.50.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 // indirect
 	golang.org/x/image v0.33.0 // indirect
 	golang.org/x/mod v0.30.0 // indirect
@@ -87,5 +87,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.40.0 // indirect
 )
