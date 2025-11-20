@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 // orgRootDomainsListCmd represents the add command
@@ -17,9 +19,19 @@ var orgRootDomainsListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, domain := range domains.Items {
-			fmt.Println(domain.Domain)
+
+		if jsonOutput {
+			outBytes, err := json.MarshalIndent(domains.Items, "", "  ")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(outBytes))
+		} else {
+			for _, d := range domains.Items {
+				fmt.Println(d.Domain)
+			}
 		}
+
 	},
 }
 

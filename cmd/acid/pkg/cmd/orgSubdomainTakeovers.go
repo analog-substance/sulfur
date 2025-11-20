@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -26,8 +27,15 @@ var orgSubdomainTakeoversCmd = &cobra.Command{
 			log.Fatal("error communicating with API", err)
 		}
 
-		takeoverTable(res)
-
+		if jsonOutput {
+			outBytes, err := json.MarshalIndent(res, "", "  ")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(outBytes))
+		} else {
+			takeoverTable(res)
+		}
 	},
 }
 
