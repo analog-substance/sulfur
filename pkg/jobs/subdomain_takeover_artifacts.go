@@ -39,6 +39,10 @@ func SubdomainTakeoverArtifacts() {
 		}
 
 		f, err := filesystem.NewFileFromBytes(screenshot, "subdomain-takeover-screenshot.png")
+		if err != nil {
+			logger.Error("Error creating file from bytes", "record", record, "error", err)
+			continue
+		}
 		artifact.SetArtifacts([]*filesystem.File{f})
 
 		err = artifact.Save()
