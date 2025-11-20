@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"time"
@@ -31,6 +32,7 @@ func BadCertArtifacts() {
 
 	for _, record := range dnsRecords {
 		logger.Info("processing record", "record", record)
+		log.Println("processing record", "record", record)
 		screenshot, err := Screenshot(record.Name(), record.Value(), logger)
 		if err != nil {
 			logger.Error("Error getting screenshot", "record", record, "error", err)
