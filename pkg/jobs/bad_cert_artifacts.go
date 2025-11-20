@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net"
 	"os"
 	"time"
 
@@ -33,13 +34,26 @@ func BadCertArtifacts() {
 	for _, record := range dnsRecords {
 		logger.Info("processing record", "record", record)
 		log.Println("processing record", "record", record)
-		screenshot, err := Screenshot(record.Name(), record.Value(), logger)
+
+		parsedIP := net.ParseIP(record.Value())
+		if parsedIP == nil {
+			logger.Error("Error parsing ip", "ip", record.Value())
+			continue
+		}
+
+		ipAddr, err := model.IPAddressFirstOrCreate(record.Value())
+		if err != nil {
+			logger.Error("Error getting ip address", "error", err)
+			continue
+		}
+
+		screenshot, err := Screenshot(record.Name(), parsedIP.String(), logger)
 		if err != nil {
 			logger.Error("Error getting screenshot", "record", record, "error", err)
 			continue
 		}
 
-		artifact, err := model.ArtifactFirstOrCreate(record.Id(), "")
+		artifact, err := model.ArtifactFirstOrCreate(record.Id(), ipAddr.Id())
 		if err != nil {
 			logger.Error("Error creating artifact obj", "record", record, "error", err)
 			continue
@@ -113,3 +127,81 @@ func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
 		chromedp.FullScreenshot(res, quality),
 	}
 }
+
+//type Chrome struct {
+//	userDataDir     string
+//	logger          *slog.Logger
+//	allocatorCtx    context.Context
+//	allocatorCancel context.CancelFunc
+//	browserCtx      context.Context
+//	browserCancel   context.CancelFunc
+//	jobs            <-chan string
+//	results         <-chan int
+//}
+//
+//func NewChrome(logger *slog.Logger) *Chrome {
+//	userData, err := os.MkdirTemp("", "sulfur-screenshot-*")
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	c := &Chrome{
+//		userDataDir: userData,
+//		logger:      logger,
+//	}
+//
+//	go c.worker()
+//
+//	return c
+//}
+//
+//func (c *Chrome) setup() {
+//	// create context
+//	c.allocatorCtx, c.allocatorCancel = chromedp.NewExecAllocator(
+//		context.Background(),
+//		//chromedp.Flag("host-resolver-rules", fmt.Sprintf("MAP %s %s", host, ip)),
+//		chromedp.Flag("ignore-certificate-errors", "1"),
+//		chromedp.Flag("headless", true),
+//		chromedp.UserDataDir(c.userDataDir),
+//	)
+//
+//	c.browserCtx, c.browserCancel = chromedp.NewContext(
+//		c.allocatorCtx,
+//	)
+//}
+//
+//func (c *Chrome) stop() {
+//	if err := os.RemoveAll(c.userDataDir); err != nil {
+//		time.Sleep(3 * time.Second)
+//		if err := os.RemoveAll(c.userDataDir); err != nil {
+//			c.logger.Error("failed to delete chrome data dir", "dir", c.userDataDir, "err", err)
+//		}
+//	}
+//}
+//
+//func (c *Chrome) Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
+//
+//}
+//
+//func (c *Chrome) worker() {
+//	for j := range c.jobs {
+//
+//		var buf []byte
+//		// capture entire browser viewport, returning png with quality=90
+//		err := chromedp.Run(c.browserCtx, chromedp.Navigate(fmt.Sprintf(j)))
+//		if err != nil {
+//			c.logger.Error("Ignoring navigation error", "error", err)
+//		}
+//		err = chromedp.Run(c.browserCtx, chromedp.Sleep(2 * time.Second), chromedp.FullScreenshot(&buf, 90))
+//		if err != nil {
+//			c.logger.Error("Ignoring navigation error", "error", err)
+//		}
+//
+//
+//	}
+//}
+//
+//
+//type screenshotResult struct {
+//	dns
+//}
