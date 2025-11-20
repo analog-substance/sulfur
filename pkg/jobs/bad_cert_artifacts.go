@@ -30,6 +30,7 @@ func BadCertArtifacts() {
 	logger.Info("processing results", "count", total)
 
 	for _, record := range dnsRecords {
+		logger.Info("processing record", "record", record)
 		screenshot, err := Screenshot(record.Name(), record.Value(), logger)
 		if err != nil {
 			logger.Error("Error getting screenshot", "record", record, "error", err)
