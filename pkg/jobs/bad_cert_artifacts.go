@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/analog-substance/sulfur/pkg/app_state"
@@ -87,6 +88,17 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 				logger.Error("failed to delete chrome data dir", "dir", userData, "err", err)
 			}
 		}
+
+		snapPath := filepath.Join("/tmp/snap-private-tmp/snap.chromium", userData)
+		if _, err := os.Stat(snapPath); !os.IsNotExist(err) {
+			if err := os.RemoveAll(snapPath); err != nil {
+				time.Sleep(3 * time.Second)
+				if err := os.RemoveAll(snapPath); err != nil {
+					logger.Error("failed to delete chrome data dir", "dir", snapPath, "err", err)
+				}
+			}
+		}
+
 	}()
 
 	// create context
