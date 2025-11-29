@@ -15,6 +15,8 @@ github.com/charmbracelet/lipgloss v1.1.0 h1:vYXsiLHVkK7fp74RkV7b2kq9+zDLoEU4MZoF
 github.com/charmbracelet/lipgloss v1.1.0/go.mod h1:/6Q8FR2o+kj8rz4Dq0zQc3vYf7X+B0binUUBwA0aL30=
 github.com/charmbracelet/x/ansi v0.11.1 h1:iXAC8SyMQDJgtcz9Jnw+HU8WMEctHzoTAETIeA3JXMk=
 github.com/charmbracelet/x/ansi v0.11.1/go.mod h1:M49wjzpIujwPceJ+t5w3qh2i87+HRtHohgb5iTyepL0=
+github.com/charmbracelet/x/ansi v0.11.2 h1:XAG3FSjiVtFvgEgGrNBkCNNYrsucAt8c6bfxHyROLLs=
+github.com/charmbracelet/x/ansi v0.11.2/go.mod h1:9tY2bzX5SiJCU0iWyskjBeI2BRQfvPqI+J760Mjf+Rg=
 github.com/charmbracelet/x/cellbuf v0.0.14 h1:iUEMryGyFTelKW3THW4+FfPgi4fkmKnnaLOXuc+/Kj4=
 github.com/charmbracelet/x/cellbuf v0.0.14/go.mod h1:P447lJl49ywBbil/KjCk2HexGh4tEY9LH0/1QrZZ9rA=
 github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk=
@@ -162,6 +164,8 @@ github.com/pocketbase/pocketbase v0.29.0 h1:oL6qvkU2QSybClVtQdaq9Z1F3Wk59iKYCfIa
 github.com/pocketbase/pocketbase v0.29.0/go.mod h1:SqyH7o/3e+/uLySATlJqxH4S8gyU6R0adG56ZSV1vuU=
 github.com/pocketbase/pocketbase v0.33.0 h1:v2EfiY3hxigzRJ/BwFuwVn0vUv7d2QQoD5zUFPaKR9o=
 github.com/pocketbase/pocketbase v0.33.0/go.mod h1:9BEs+CRV7CrS+X5LfBh4bdJQsbzQAIklft3ovGe/c5A=
+github.com/pocketbase/pocketbase v0.34.0 h1:5W80PrGvkRYIMAIK90F7w031/hXgZVz1KSuCJqSpgJo=
+github.com/pocketbase/pocketbase v0.34.0/go.mod h1:K/9z/Zb9PR9yW2Qyoc73jHV/EKT8cMTk9bQWyrzYlvI=
 github.com/projectdiscovery/blackrock v0.0.1 h1:lHQqhaaEFjgf5WkuItbpeCZv2DUIE45k0VbGJyft6LQ=
 github.com/projectdiscovery/blackrock v0.0.1/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
 github.com/projectdiscovery/cdncheck v1.1.24 h1:6pJ4XnovIrTWzlCJs5/QD1tv6wvK0wiICmmdY0/8WAs=
@@ -172,6 +176,8 @@ github.com/projectdiscovery/cdncheck v1.1.29 h1:A+wPQyi2OKikHigD91Y2y7NxCwVGhnjj
 github.com/projectdiscovery/cdncheck v1.1.29/go.mod h1:dFEGsG0qAJY0AaRr2N1BY0OtZiTxS4kYeT5+OkF8t1U=
 github.com/projectdiscovery/cdncheck v1.2.10 h1:Ox86LS8RFjq6pYNTP3Eqdawlor/h+bnb7BTEKBpzFyM=
 github.com/projectdiscovery/cdncheck v1.2.10/go.mod h1:ibL9HoZs2JYTEUBOZo4f+W+XEzQifFLOf4bpgFStgj4=
+github.com/projectdiscovery/cdncheck v1.2.11 h1:ctqccij5PeobUjcTABZyGvbULxa3WT/hlL+yN1mSbyo=
+github.com/projectdiscovery/cdncheck v1.2.11/go.mod h1:jyWMON16zbfCgi1Wp7nsGjZNFdRstYdK3IqjtnHB82Q=
 github.com/projectdiscovery/dnsx v1.2.2 h1:ZjUov0GOyrS8ERlKAAhk+AOkqzaYHBzCP0qZfO+6Ihg=
 github.com/projectdiscovery/dnsx v1.2.2/go.mod h1:3iYm86OEqo0WxeGDkVl5WZNmG0qYE5TYNx8fBg6wX1I=
 github.com/projectdiscovery/retryabledns v1.0.102 h1:R8PzFCVofqLX3Bn4kdjOsE9wZ83FQjXZMDNs4/bHxzI=
@@ -182,6 +188,8 @@ github.com/projectdiscovery/retryabledns v1.0.105 h1:G8ln01igkNTQ5xvMY5K4cx5XIfK
 github.com/projectdiscovery/retryabledns v1.0.105/go.mod h1:3EZKhRL1rokqYR4q5qKK1eLBEe8mSzgtzkMOJilO1Ok=
 github.com/projectdiscovery/retryabledns v1.0.108 h1:47LYRW2LY/0cDnZQfUhoOHNxe9rNc9NQ9ZfNrV/GbyM=
 github.com/projectdiscovery/retryabledns v1.0.108/go.mod h1:j7H7K6JZePh9PeNleeRUtDSrkUKMpwDhZw3Ogewzio8=
+github.com/projectdiscovery/retryabledns v1.0.109 h1:2tDpoTRFlWmOsiH5Z/qVGrOzlB/hUO9PF2s6ol9BWcQ=
+github.com/projectdiscovery/retryabledns v1.0.109/go.mod h1:yGKECPB69MWT1EZwWj5zejZflgP+KUDd5dBYZm3igxs=
 github.com/projectdiscovery/utils v0.4.21 h1:yAothTUSF6NwZ9yoC4iGe5gSBrovqKR9JwwW3msxk3Q=
 github.com/projectdiscovery/utils v0.4.21/go.mod h1:HJuJFqjB6EmVaDl0ilFPKvLoMaX2GyE6Il2TqKXNs8I=
 github.com/projectdiscovery/utils v0.4.22 h1:OO3FU2uX967sQxu5JtpdBZNzOevvKHAhWqkoTGl+C0A=
@@ -190,6 +198,8 @@ github.com/projectdiscovery/utils v0.6.1 h1:9bf3J2G4WJMULGm4Xq7+96+Uj4QpYID/tNnz
 github.com/projectdiscovery/utils v0.6.1/go.mod h1:j4Fb6PDir9PcTxLOL9cpSVDPVKtLTZwdVxxMAeG0JjA=
 github.com/projectdiscovery/utils v0.7.0 h1:akjTW9tt2QTv3BCiXlqSf7OfodrqrcaIQowuF7H1BWw=
 github.com/projectdiscovery/utils v0.7.0/go.mod h1:j4Fb6PDir9PcTxLOL9cpSVDPVKtLTZwdVxxMAeG0JjA=
+github.com/projectdiscovery/utils v0.7.2 h1:v9mkyPh2TxM4eODTanXWhnwdut37elq2slzMa0JdNhg=
+github.com/projectdiscovery/utils v0.7.2/go.mod h1:uDdQ3/VWomai98l+a3Ye/srDXdJ4xUIar/mSXlQ9gBM=
 github.com/prometheus-community/pro-bing v0.7.0 h1:KFYFbxC2f2Fp6c+TyxbCOEarf7rbnzr9Gw8eIb0RfZA=
 github.com/prometheus-community/pro-bing v0.7.0/go.mod h1:Moob9dvlY50Bfq6i88xIwfyw7xLFHH69LUgx9n5zqCE=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec h1:W09IVJc94icq4NjY3clb7Lk8O1qJ8BdBEF8z0ibU0rE=
@@ -276,6 +286,8 @@ golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 h1:R9PFI6EUdfVKgwKjZef7QIwGc
 golang.org/x/exp v0.0.0-20250718183923-645b1fa84792/go.mod h1:A+z0yzpGtvnG90cToK5n2tu8UJVP2XUATh+r+sfOOOc=
 golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 h1:zfMcR1Cs4KNuomFFgGefv5N0czO2XZpUbxGUy8i8ug0=
 golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6/go.mod h1:46edojNIoXTNOhySWIWdix628clX9ODXwPsQuG6hsK0=
+golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39 h1:DHNhtq3sNNzrvduZZIiFyXWOL9IWaDPHqTnLJp+rCBY=
+golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39/go.mod h1:46edojNIoXTNOhySWIWdix628clX9ODXwPsQuG6hsK0=
 golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/image v0.28.0 h1:gdem5JW1OLS4FbkWgLO+7ZeFzYtL3xClb97GaUzYMFE=
 golang.org/x/image v0.28.0/go.mod h1:GUJYXtnGKEUgggyzh+Vxt+AviiCcyiwpsl8iQ8MvwGY=
@@ -364,6 +376,8 @@ modernc.org/libc v1.66.10 h1:yZkb3YeLx4oynyR+iUsXsybsX4Ubx7MQlSYEw4yj59A=
 modernc.org/libc v1.66.10/go.mod h1:8vGSEwvoUoltr4dlywvHqjtAqHBaw0j1jI7iFBTAr2I=
 modernc.org/libc v1.67.0 h1:QzL4IrKab2OFmxA3/vRYl0tLXrIamwrhD6CKD4WBVjQ=
 modernc.org/libc v1.67.0/go.mod h1:QvvnnJ5P7aitu0ReNpVIEyesuhmDLQ8kaEoyMjIFZJA=
+modernc.org/libc v1.67.1 h1:bFaqOaa5/zbWYJo8aW0tXPX21hXsngG2M7mckCnFSVk=
+modernc.org/libc v1.67.1/go.mod h1:QvvnnJ5P7aitu0ReNpVIEyesuhmDLQ8kaEoyMjIFZJA=
 modernc.org/mathutil v1.7.1 h1:GCZVGXdaN8gTqB1Mf/usp1Y/hSqgI2vAGGP4jZMCxOU=
 modernc.org/mathutil v1.7.1/go.mod h1:4p5IwJITfppl0G4sUEDtCr4DthTaT47/N3aT6MhfgJg=
 modernc.org/memory v1.11.0 h1:o4QC8aMQzmcwCK3t3Ux/ZHmwFPzE6hf2Y5LbkRs+hbI=
