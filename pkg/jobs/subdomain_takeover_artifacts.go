@@ -25,7 +25,7 @@ func SubdomainTakeoverArtifacts() {
 
 	for _, record := range dnsRecords {
 		logger.Info("processing record", "record", record)
-		log.Println("processing record", "record", record.Id(), record.Name())
+		log.Println("processing record", "job", "SubdomainTakeoverArtifacts", "record", record.Id(), record.Name())
 		screenshot, err := Screenshot(record.Name(), record.Value(), logger)
 		if err != nil {
 			logger.Error("Error getting screenshot", "record", record, "error", err)

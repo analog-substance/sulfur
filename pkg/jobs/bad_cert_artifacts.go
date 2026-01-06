@@ -34,7 +34,7 @@ func BadCertArtifacts() {
 
 	for _, record := range dnsRecords {
 		logger.Info("processing record", "record", record)
-		log.Println("processing record", "record", record)
+		log.Println("processing record", "job", "BadCertArtifacts", "record", record)
 
 		parsedIP := net.ParseIP(record.Value())
 		if parsedIP == nil {
