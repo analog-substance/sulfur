@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/analog-substance/sulfur/pkg/app_state"
@@ -74,7 +75,12 @@ func BadCertArtifacts() {
 	}
 }
 
+var screenshotMutex sync.Mutex
+
 func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
+
+	screenshotMutex.Lock()
+	defer screenshotMutex.Unlock()
 
 	userData, err := os.MkdirTemp("", "sulfur-screenshot-*")
 	if err != nil {
