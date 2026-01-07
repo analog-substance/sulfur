@@ -6,8 +6,6 @@ import (
 	"log"
 	"log/slog"
 	"net"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -79,35 +77,35 @@ var screenshotMutex sync.Mutex
 
 func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 
-	screenshotMutex.Lock()
-	defer screenshotMutex.Unlock()
+	//screenshotMutex.Lock()
+	//defer screenshotMutex.Unlock()
 
-	userData, err := os.MkdirTemp("", "sulfur-screenshot-*")
-	if err != nil {
-		return nil, err
-	}
-
-	defer func() {
-		log.Println("Cleanup screenshot")
-
-		if err := os.RemoveAll(userData); err != nil {
-			time.Sleep(3 * time.Second)
-			if err := os.RemoveAll(userData); err != nil {
-				logger.Error("failed to delete chrome data dir", "dir", userData, "err", err)
-			}
-		}
-
-		snapPath := filepath.Join("/tmp/snap-private-tmp/snap.chromium", userData)
-		if _, err := os.Stat(snapPath); !os.IsNotExist(err) {
-			if err := os.RemoveAll(snapPath); err != nil {
-				time.Sleep(3 * time.Second)
-				if err := os.RemoveAll(snapPath); err != nil {
-					logger.Error("failed to delete chrome data dir", "dir", snapPath, "err", err)
-				}
-			}
-		}
-
-	}()
+	//userData, err := os.MkdirTemp("", "sulfur-screenshot-*")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//defer func() {
+	//	log.Println("Cleanup screenshot")
+	//
+	//	if err := os.RemoveAll(userData); err != nil {
+	//		time.Sleep(3 * time.Second)
+	//		if err := os.RemoveAll(userData); err != nil {
+	//			logger.Error("failed to delete chrome data dir", "dir", userData, "err", err)
+	//		}
+	//	}
+	//
+	//	snapPath := filepath.Join("/tmp/snap-private-tmp/snap.chromium", userData)
+	//	if _, err := os.Stat(snapPath); !os.IsNotExist(err) {
+	//		if err := os.RemoveAll(snapPath); err != nil {
+	//			time.Sleep(3 * time.Second)
+	//			if err := os.RemoveAll(snapPath); err != nil {
+	//				logger.Error("failed to delete chrome data dir", "dir", snapPath, "err", err)
+	//			}
+	//		}
+	//	}
+	//
+	//}()
 
 	log.Println("screenshot: new allocator")
 	// create context
@@ -116,7 +114,7 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 		chromedp.Flag("host-resolver-rules", fmt.Sprintf("MAP %s %s", host, ip)),
 		chromedp.Flag("ignore-certificate-errors", "1"),
 		chromedp.Flag("headless", true),
-		chromedp.UserDataDir(userData),
+		//chromedp.UserDataDir(userData),
 	)
 	defer allocatorCancel()
 
@@ -131,7 +129,7 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 	// capture entire browser viewport, returning png with quality=90
 	log.Println("screenshot: navigate")
 
-	err = chromedp.Run(ctx, chromedp.Navigate(fmt.Sprintf("https://%s", host)))
+	err := chromedp.Run(ctx, chromedp.Navigate(fmt.Sprintf("https://%s", host)))
 	if err != nil {
 		logger.Error("Ignoring navigation error", "error", err)
 	}
