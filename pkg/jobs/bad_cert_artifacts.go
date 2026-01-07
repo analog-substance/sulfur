@@ -88,6 +88,8 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 	}
 
 	defer func() {
+		log.Println("Cleanup screenshot")
+
 		if err := os.RemoveAll(userData); err != nil {
 			time.Sleep(3 * time.Second)
 			if err := os.RemoveAll(userData); err != nil {
@@ -107,6 +109,7 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 
 	}()
 
+	log.Println("screenshot: new allocator")
 	// create context
 	allocatorCtx, allocatorCancel := chromedp.NewExecAllocator(
 		context.Background(),
@@ -117,6 +120,7 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 	)
 	defer allocatorCancel()
 
+	log.Println("screenshot: new context")
 	ctx, cancel := chromedp.NewContext(
 		allocatorCtx,
 		//chromedp.WithDebugf(debug.Printf),
@@ -125,12 +129,18 @@ func Screenshot(host, ip string, logger *slog.Logger) ([]byte, error) {
 
 	var buf []byte
 	// capture entire browser viewport, returning png with quality=90
+	log.Println("screenshot: navigate")
+
 	err = chromedp.Run(ctx, chromedp.Navigate(fmt.Sprintf("https://%s", host)))
 	if err != nil {
 		logger.Error("Ignoring navigation error", "error", err)
 	}
 
+	log.Println("screenshot: fullScreenshot()")
+
 	err = chromedp.Run(ctx, fullScreenshot(fmt.Sprintf("https://%s", host), 90, &buf))
+
+	log.Println("screenshot: return")
 
 	return buf, err
 }
